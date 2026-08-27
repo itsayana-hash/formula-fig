@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The FFFull Set — FFFormulations</title>
+    <link
+      rel="preload"
+      href="assets/fonts/FF_Sans-Regular_web.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="highlight" data-step="set">
+      <section class="hero" aria-label="Product gallery">
+        <div class="hero-stage">
+          <div class="bottles">
+            <button
+              class="bottle"
+              type="button"
+              data-index="0"
+              aria-pressed="false"
+              aria-label="View Amino Balancing Gel Cleanser"
+            >
+              <img src="assets/bottle-1.png" alt="" width="311" height="1324" />
+            </button>
+            <button
+              class="bottle"
+              type="button"
+              data-index="1"
+              aria-pressed="false"
+              aria-label="View Hydra-Ferment Activating Essence"
+            >
+              <img src="assets/bottle-2.png" alt="" width="298" height="1256" />
+            </button>
+            <button
+              class="bottle"
+              type="button"
+              data-index="2"
+              aria-pressed="false"
+              aria-label="View Barrier Cushioning Gel Cream"
+            >
+              <img src="assets/bottle-3.png" alt="" width="275" height="1212" />
+            </button>
+            <button
+              class="bottle"
+              type="button"
+              data-index="3"
+              aria-pressed="false"
+              aria-label="View Multi-Layer Hydration Matrix Serum"
+            >
+              <img src="assets/bottle-4.png" alt="" width="263" height="951" />
+            </button>
+          </div>
+        </div>
+      </section>
+      <div class="edge edge--left" aria-hidden="true"></div>
+      <div class="edge edge--right" aria-hidden="true"></div>
+
+      <section class="panel">
+        <div class="copy">
+          <div class="identity">
+            <h1 data-field="title">The FFFull Set</h1>
+            <p class="description" data-field="description">
+              A complete daily skincare routine, built on treatment-room
+              science.
+            </p>
+          </div>
+
+          <div class="links">
+            <button
+              class="text-link details-link"
+              type="button"
+              aria-expanded="false"
+              aria-controls="details-drawer"
+            >
+              <span class="icon-box icon-box--arrow" aria-hidden="true">
+                <img
+                  class="icon-arrow"
+                  src="assets/icon-arrow.svg"
+                  alt=""
+                  width="12.226"
+                  height="9"
+                />
+              </span>
+              Product Details
+            </button>
+            <button class="text-link view-all" type="button">
+              <span class="icon-box icon-box--arrow" aria-hidden="true">
+                <img
+                  class="icon-arrow"
+                  src="assets/icon-arrow.svg"
+                  alt=""
+                  width="12.226"
+                  height="9"
+                />
+              </span>
+              View all
+            </button>
+          </div>
+
+          <div class="details" id="product-details" hidden>
+            <p>
+              Four complementary formulas, packaged as one daily cadence.
+              Apply morning and night as directed.
+            </p>
+          </div>
+        </div>
+
+        <article class="mini-card">
+          <div class="thumb">
+            <img
+              data-field="thumb"
+              src="assets/card-set.png"
+              alt="The FFFull Set bottles"
+              width="140"
+              height="174"
+            />
+          </div>
+          <div class="mini-copy">
+            <p class="brand">FFFormulations</p>
+            <p class="mini-title" data-field="cardTitle">The FFFull Set</p>
+            <p class="price" data-field="price">$125</p>
+          </div>
+          <button
+            class="quick-add"
+            type="button"
+            aria-pressed="false"
+            aria-label="Add The FFFull Set to bag"
+          >
+            <span class="quick-add__icon" data-state="plus">
+              <img
+                class="icon-plus"
+                src="assets/icon-plus.svg"
+                alt=""
+                width="8"
+                height="9"
+              />
+            </span>
+            <span class="quick-add__icon" data-state="check" hidden>
+              <img
+                class="icon-check"
+                src="assets/icon-check.svg"
+                alt=""
+                width="8.55"
+                height="8.21"
+              />
+            </span>
+          </button>
+        </article>
+      </section>
+    </main>
+
+    <div
+      class="details-overlay"
+      id="details-overlay"
+      hidden
+      aria-hidden="true"
+    >
+      <div class="details-scrim" data-details-dismiss></div>
+      <aside
+        class="details-drawer"
+        id="details-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="details-drawer-title"
+      >
+        <div class="details-drawer__handle" aria-hidden="true">
+          <img
+            class="icon-drag-handle"
+            src="assets/icon-drag-handle.svg"
+            alt=""
+            width="102"
+            height="2"
+          />
+        </div>
+        <header class="details-drawer__header">
+          <h2 class="details-drawer__title" id="details-drawer-title">
+            The FFFull Set
+          </h2>
+          <button
+            class="details-drawer__close"
+            type="button"
+            aria-label="Close product details"
+          >
+            <span class="icon-box icon-box--close" aria-hidden="true">
+              <img
+                class="icon-close"
+                src="assets/icon-close.svg"
+                alt=""
+                width="6"
+                height="8"
+              />
+            </span>
+          </button>
+        </header>
+        <div class="details-drawer__tabs">
+          <div class="details-drawer__tab-group">
+            <span class="details-drawer__tab is-active">Description</span>
+            <span class="details-drawer__tab">Solutions</span>
+            <span class="details-drawer__tab">Skin Benefits</span>
+            <span class="details-drawer__tab">Formula Fig Standard</span>
+          </div>
+        </div>
+        <div class="details-drawer__body">
+          <p data-drawer-field="details">
+            Four complementary formulas, packaged as one daily cadence.
+            Apply morning and night as directed.
+          </p>
+        </div>
+        <footer class="details-drawer__footer">
+          <div class="details-drawer__meta">
+            <p data-drawer-field="footerTitle">The FFFull Set</p>
+            <p data-drawer-field="price">$125</p>
+          </div>
+          <button class="details-drawer__atb" type="button">Add to bag</button>
+        </footer>
+      </aside>
+    </div>
+
+    <p class="status" id="status" aria-live="polite"></p>
+    <script src="app.js"></script>
+  </body>
+</html>
