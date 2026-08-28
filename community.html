@@ -3,6 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      (function () {
+        if (location.protocol === "file:") return;
+        var path = location.pathname;
+        if (/\/community\/?$/.test(path)) {
+          document.write(
+            '<base href="' + path.replace(/community\/?$/, "") + '">'
+          );
+        }
+      })();
+    </script>
     <title>The Community — FFFormulations</title>
     <link
       rel="preload"
