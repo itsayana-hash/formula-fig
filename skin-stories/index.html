@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Skin Stories — FFFormulations</title>
+    <link
+      rel="preload"
+      href="../assets/fonts/FF_Sans-Regular_web.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <section class="clinical" aria-label="Skin Stories">
+      <div class="clinical-media" data-media>
+        <img
+          class="clinical-photo clinical-photo--base"
+          src="../assets/clinical/portrait.jpg"
+          alt="Close-up portrait of a woman with light wavy hair, warm side lighting on her skin"
+          width="1440"
+          height="1795"
+        />
+        <img
+          class="clinical-photo clinical-photo--frost"
+          src="../assets/clinical/portrait.jpg"
+          alt=""
+          width="1440"
+          height="1795"
+          aria-hidden="true"
+        />
+        <img
+          class="clinical-photo clinical-photo--sharp"
+          src="../assets/clinical/portrait.jpg"
+          alt=""
+          width="1440"
+          height="1795"
+          aria-hidden="true"
+        />
+        <div class="clinical-reveal" data-reveal aria-hidden="true"></div>
+      </div>
+
+      <div class="clinical-copy">
+        <div class="clinical-copy__text">
+          <p class="clinical-quote">
+            “I’ve been dealing with acne and breakouts for years and I’m still
+            figuring it out.”
+          </p>
+          <p class="clinical-handle">@sarajones</p>
+        </div>
+        <div class="clinical-controls" role="group" aria-label="Story navigation">
+          <button
+            class="media-control"
+            type="button"
+            data-prev
+            disabled
+            aria-label="Previous story"
+          >
+            <span class="media-control__icon" aria-hidden="true">
+              <img
+                class="icon-caret icon-caret--back"
+                src="../assets/clinical/caret-left.svg"
+                alt=""
+                width="7"
+                height="9"
+              />
+            </span>
+          </button>
+          <button
+            class="media-control"
+            type="button"
+            data-next
+            aria-label="Next story"
+          >
+            <span class="media-control__icon" aria-hidden="true">
+              <img
+                class="icon-caret icon-caret--forward"
+                src="../assets/clinical/caret-right.svg"
+                alt=""
+                width="7"
+                height="9"
+              />
+            </span>
+          </button>
+        </div>
+      </div>
+    </section>
+    <script src="../skin-stories.js"></script>
+  </body>
+</html>
