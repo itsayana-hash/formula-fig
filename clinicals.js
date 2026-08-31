@@ -12,6 +12,9 @@ const TAB_ORDER = ["cleanse", "balance", "treat", "protect"];
 const STEPS = cards.length;
 const DRAG_THRESHOLD = 8;
 const SNAP_PX = 32;
+const WHEEL_SNAP = 36;
+const WHEEL_LOCK_MS = 480;
+const DESKTOP_MQ = "(min-width: 860px)";
 
 let tabIndex = 0;
 let step = 0;
@@ -19,6 +22,10 @@ let offsetX = 0;
 let drag = null;
 let raf = 0;
 let suppressClick = false;
+let wheelAccum = 0;
+let wheelLock = false;
+let wheelReset = 0;
+let wheelUnlock = 0;
 
 function cardWidth() {
   const laidOut = cards[0].offsetWidth;
@@ -64,7 +71,10 @@ function setActiveVisual(index) {
     card.classList.toggle("is-past", i < index);
   });
   nodes.forEach((node) => {
-    node.classList.toggle("is-on", Number(node.dataset.node) <= index);
+    const i = Number(node.dataset.node);
+    node.classList.toggle("is-on", i <= index);
+    if (i === index) node.setAttribute("aria-current", "step");
+    else node.removeAttribute("aria-current");
   });
 }
 
@@ -73,6 +83,84 @@ function applyStep(next, { animate = true } = {}) {
   root.dataset.step = String(step);
   setActiveVisual(step);
   setOffset(step * stride(), { animate });
+}
+
+function goStep(next) {
+  const clamped = clamp(next, 0, STEPS - 1);
+  if (clamped === step) return false;
+  applyStep(clamped);
+  return true;
+}
+
+function isDesktop() {
+  return window.matchMedia(DESKTOP_MQ).matches;
+}
+
+function isTypingTarget(target) {
+  return Boolean(
+    target?.closest?.("input, textarea, select, [contenteditable='true']")
+  );
+}
+
+function wheelDeltaX(event) {
+  let x = event.deltaX;
+  let y = event.deltaY;
+  if (event.deltaMode === 1) {
+    x *= 16;
+    y *= 16;
+  } else if (event.deltaMode === 2) {
+    x *= root.clientWidth;
+    y *= root.clientHeight;
+  }
+  if (event.shiftKey && Math.abs(x) < Math.abs(y)) return y;
+  return x;
+}
+
+function lockWheel() {
+  wheelLock = true;
+  wheelAccum = 0;
+  window.clearTimeout(wheelUnlock);
+  wheelUnlock = window.setTimeout(() => {
+    wheelLock = false;
+    wheelAccum = 0;
+  }, WHEEL_LOCK_MS);
+}
+
+function onWheel(event) {
+  if (drag) return;
+
+  const dx = event.deltaX;
+  const dy = event.deltaY;
+  const horizontal = wheelDeltaX(event);
+  const vertical = event.shiftKey ? 0 : dy;
+
+  if (Math.abs(horizontal) < 1) return;
+  if (!event.shiftKey && Math.abs(vertical) > Math.abs(dx) * 1.25) return;
+
+  event.preventDefault();
+  if (wheelLock) return;
+
+  wheelAccum += horizontal;
+  window.clearTimeout(wheelReset);
+  wheelReset = window.setTimeout(() => {
+    wheelAccum = 0;
+  }, 80);
+
+  if (wheelAccum >= WHEEL_SNAP && goStep(step + 1)) {
+    lockWheel();
+  } else if (wheelAccum <= -WHEEL_SNAP && goStep(step - 1)) {
+    lockWheel();
+  }
+}
+
+function onKeydown(event) {
+  if (!isDesktop()) return;
+  if (event.metaKey || event.ctrlKey || event.altKey) return;
+  if (isTypingTarget(event.target)) return;
+  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+
+  event.preventDefault();
+  goStep(event.key === "ArrowRight" ? step + 1 : step - 1);
 }
 
 function applyTab(next) {
@@ -143,8 +231,18 @@ function finishDrag(event) {
   applyStep(stepFromGesture(session, clientX));
 }
 
+function onNodeClick(event) {
+  if (!isDesktop()) return;
+  event.preventDefault();
+  event.stopPropagation();
+  const index = Number(event.currentTarget.dataset.node);
+  if (!Number.isFinite(index)) return;
+  applyStep(index);
+}
+
 function onPointerDown(event) {
   if (!event.isPrimary || event.button !== 0) return;
+  if (event.target.closest("[data-node]")) return;
   if (event.cancelable) event.preventDefault();
 
   if (raf) {
@@ -197,10 +295,6 @@ function onPointerMove(event) {
     raf = 0;
     if (!drag) return;
     setOffset(drag.originOffset - (drag.lastX - drag.originX));
-    const s = stride() || 1;
-    setActiveVisual(
-      clamp(drag.originStep + Math.round((offsetX - drag.originOffset) / s), 0, STEPS - 1)
-    );
   });
 }
 
@@ -226,16 +320,23 @@ window.addEventListener("pointermove", onPointerMove, { passive: false });
 window.addEventListener("pointerup", finishDrag);
 window.addEventListener("pointercancel", finishDrag);
 stage.addEventListener("lostpointercapture", onLostCapture);
+root.addEventListener("wheel", onWheel, { passive: false });
+document.addEventListener("keydown", onKeydown);
 
 document.addEventListener(
   "click",
   (event) => {
     if (!suppressClick) return;
+    if (event.target.closest("[data-node]")) return;
     event.preventDefault();
     event.stopPropagation();
   },
   true
 );
+
+nodes.forEach((node) => {
+  node.addEventListener("click", onNodeClick);
+});
 
 tabs.forEach((tab) => {
   tab.addEventListener("click", () => onTabClick(tab.dataset.tab));
@@ -256,5 +357,6 @@ window.addEventListener("resize", () => {
   applyStep(step, { animate: false });
 });
 
-applyTab(0);
+const startTab = TAB_ORDER.indexOf(new URLSearchParams(location.search).get("tab"));
+applyTab(startTab >= 0 ? startTab : 0);
 applyStep(0, { animate: false });

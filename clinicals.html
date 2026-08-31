@@ -23,7 +23,7 @@
       crossorigin
     />
     <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="clinicals.css" />
+    <link rel="stylesheet" href="clinicals.css?v=motion10" />
   </head>
   <body>
     <section class="clinicals" data-tab="cleanse" data-step="0" aria-label="Clinicals">
@@ -89,10 +89,6 @@
       <header class="clinicals-header">
         <div class="clinicals-header__lead">
           <p class="clinicals-title">Consumer Perception Study</p>
-          <p class="clinicals-lede">
-            Get a look behind the scenes of the making of FFFormulations with
-            the Formula Fig team.
-          </p>
         </div>
         <button class="clinicals-more" type="button">
           View the Study<span aria-hidden="true">+</span>
@@ -169,9 +165,25 @@
               <div class="clinicals-track" aria-hidden="true">
                 <span class="clinicals-rail"></span>
                 <span class="clinicals-fill"></span>
-                <span class="clinicals-node is-on" data-node="0"></span>
-                <span class="clinicals-node" data-node="1"></span>
-                <span class="clinicals-node" data-node="2"></span>
+                <button
+                  class="clinicals-node is-on"
+                  type="button"
+                  data-node="0"
+                  aria-label="After 1 Use: First thing you notice"
+                  aria-current="step"
+                ></button>
+                <button
+                  class="clinicals-node"
+                  type="button"
+                  data-node="1"
+                  aria-label="After 1 Week: Next thing you notice"
+                ></button>
+                <button
+                  class="clinicals-node"
+                  type="button"
+                  data-node="2"
+                  aria-label="After 2 Weeks: Consistent use"
+                ></button>
               </div>
               <div class="clinicals-cards">
                 <article class="clinicals-card is-active" data-card="0">
@@ -319,6 +331,6 @@
         </div>
       </div>
     </section>
-    <script src="clinicals.js?v=layout-7"></script>
+    <script src="clinicals.js?v=motion9"></script>
   </body>
 </html>
