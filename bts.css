@@ -1,0 +1,222 @@
+html:has(.bts),
+body:has(.bts) {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--primary-background);
+}
+
+.bts {
+  --bts-w: 390px;
+  --bts-h: 844px;
+  --bts-scale: 1;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  color: var(--primary-foreground);
+  background: var(--primary-background);
+  cursor: default;
+  touch-action: none;
+  overscroll-behavior: none;
+  user-select: none;
+}
+
+.bts-frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--bts-w);
+  height: var(--bts-h);
+  transform: translate(-50%, -50%) scale(var(--bts-scale));
+  transform-origin: center center;
+  perspective: 1600px;
+  perspective-origin: 50% 50%;
+}
+
+.bts-world {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-style: preserve-3d;
+}
+
+.bts-tile {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.bts-card {
+  position: absolute;
+  margin: 0;
+  overflow: hidden;
+  background: var(--primary-background);
+  cursor: default;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.bts-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.bts-card[data-layer="bottles"] {
+  display: block;
+  left: -79px;
+  top: -93px;
+  width: 185.803px;
+  height: 185.803px;
+  z-index: 1;
+}
+
+.bts-card[data-layer="bowl"] {
+  left: -44px;
+  top: 195px;
+  width: 185.803px;
+  height: 185.803px;
+  z-index: 2;
+}
+
+.bts-card[data-layer="caps"] {
+  left: 297px;
+  top: 240px;
+  width: 185.803px;
+  height: 148.642px;
+  z-index: 5;
+}
+
+.bts-card[data-layer="moodboard"] {
+  left: 151px;
+  top: -17px;
+  width: 185.803px;
+  height: 185.803px;
+  z-index: 3;
+}
+
+.bts-card[data-layer="formulations"] {
+  left: 244px;
+  top: 692px;
+  width: 185.803px;
+  height: 232.254px;
+  z-index: 4;
+}
+
+.bts-card[data-layer="silhouette"] {
+  left: 159px;
+  top: 360px;
+  width: 185.803px;
+  height: 232.254px;
+  z-index: 7;
+}
+
+.bts-card[data-layer="tubes"] {
+  left: 0;
+  top: 618px;
+  width: 185.803px;
+  height: 148.642px;
+  z-index: 6;
+}
+
+.bts-card[data-layer="portrait"],
+.bts-card[data-layer="tray"] {
+  display: none;
+}
+
+@media (min-width: 860px) {
+  .bts {
+    --bts-w: 1440px;
+    --bts-h: 800px;
+  }
+
+  .bts-card[data-layer="bottles"] {
+    display: none;
+  }
+
+  .bts-card[data-layer="portrait"],
+  .bts-card[data-layer="tray"] {
+    display: block;
+  }
+
+  .bts-card[data-layer="bowl"] {
+    left: 1px;
+    top: 28px;
+    width: 318.75px;
+    height: 318.75px;
+    z-index: 2;
+  }
+
+  .bts-card[data-layer="moodboard"] {
+    left: 492px;
+    top: 8px;
+    width: 318.75px;
+    height: 318.75px;
+    z-index: 7;
+  }
+
+  .bts-card[data-layer="tray"] {
+    left: 855px;
+    top: 28px;
+    width: 318.75px;
+    height: 318.75px;
+    z-index: 3;
+  }
+
+  .bts-card[data-layer="portrait"] {
+    left: 1122px;
+    top: 88px;
+    width: 318.75px;
+    height: 398.438px;
+    z-index: 4;
+  }
+
+  .bts-card[data-layer="silhouette"] {
+    left: 189px;
+    top: 259px;
+    width: 318.75px;
+    height: 398.438px;
+    z-index: 6;
+  }
+
+  .bts-card[data-layer="formulations"] {
+    left: 703px;
+    top: 374px;
+    width: 318.75px;
+    height: 398.438px;
+    z-index: 5;
+  }
+
+  .bts-card[data-layer="tubes"] {
+    left: 1px;
+    top: 537px;
+    width: 318.75px;
+    height: 255px;
+    z-index: 1;
+  }
+
+  .bts-card[data-layer="caps"] {
+    left: 1122.25px;
+    top: 537px;
+    width: 318.75px;
+    height: 255px;
+    z-index: 8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bts-card {
+    will-change: auto;
+  }
+}
