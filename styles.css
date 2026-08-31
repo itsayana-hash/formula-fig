@@ -1,9 +1,11 @@
 /*
  * Shared stylesheet for pages in this repo:
- *   index.html         — product highlight module
+ *   product-highlight.html — product highlight module
  *   community.html     — community grid / detail module
  *   skin-stories.html  — skin stories / clinical module
  *   clinicals.html     — clinical evidence timeline module
+ *   routine.html       — routine steps module
+ *   bts.html           — behind-the-scenes collage module
  *
  * Sections are labeled below. Shared rules (fonts, tokens, reset, and a few
  * primitives like .text-link) apply to both pages. Module-specific rules are
@@ -55,7 +57,7 @@
   --ease: cubic-bezier(0.45, 0, 0.15, 1);
   --copy-duration: 280ms; /* product highlight default; community overrides below */
 
-  /* Product highlight (index.html) */
+  /* Product highlight (product-highlight.html) */
   --panel-pad: 10px;
   --hero-pad-top: 20px;
   --hero-pad-x: 5px;
@@ -177,7 +179,7 @@ img {
 }
 
 /* ==========================================================================
-   Product highlight — index.html
+   Product highlight — product-highlight.html
    Bottle gallery, copy panel, mini-card, and details drawer.
    ========================================================================== */
 
@@ -799,7 +801,7 @@ body.is-details-open {
     --f0: 15px;
     --f1: 18px;
 
-    /* Product highlight (index.html) */
+    /* Product highlight (product-highlight.html) */
     --panel-pad: 20px;
     --hero-pad-top: 0;
     --hero-pad-x: 20px;

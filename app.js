@@ -88,6 +88,14 @@ const descriptionEl = document.querySelector('[data-field="description"]');
 const cardTitleEl = document.querySelector('[data-field="cardTitle"]');
 const priceEl = document.querySelector('[data-field="price"]');
 const thumbEl = document.querySelector('[data-field="thumb"]');
+const assetBase = (() => {
+  const script = document.querySelector('script[src*="app.js"]');
+  return script ? new URL(".", script.src).href : "";
+})();
+
+function assetUrl(path) {
+  return assetBase ? new URL(path, assetBase).href : path;
+}
 
 const added = {
   set: false,
@@ -203,7 +211,7 @@ function renderCopy() {
   descriptionEl.textContent = product.description;
   cardTitleEl.textContent = product.cardTitle;
   priceEl.textContent = product.price;
-  thumbEl.src = product.thumb;
+  thumbEl.src = assetUrl(product.thumb);
   thumbEl.width = product.thumbSize[0];
   thumbEl.height = product.thumbSize[1];
   thumbEl.alt =
