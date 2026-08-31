@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Routine — FFFormulations</title>
+    <link
+      rel="preload"
+      href="../assets/fonts/FF_Sans-Regular_web.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../routine.css?v=7" />
+  </head>
+  <body>
+    <section class="routine" data-step="cleanse" data-playing="true" aria-label="Routine">
+      <div class="routine-shell">
+        <div class="routine-media" data-media>
+          <div class="routine-media__stack">
+            <video
+              class="routine-media__photo is-on"
+              data-hero
+              src="../assets/routine/hero.mp4"
+              poster="../assets/routine/hero-lifestyle.png"
+              width="695"
+              height="800"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="auto"
+              aria-label="Person pouring cleanser from a green bottle into their palm"
+            ></video>
+          </div>
+
+          <div class="routine-phase" aria-hidden="true">
+            <img
+              class="routine-phase__icon is-on"
+              data-phase="cleanse"
+              src="../assets/routine/icon-cleanse.svg"
+              alt=""
+              width="24"
+              height="24"
+            />
+            <img
+              class="routine-phase__icon"
+              data-phase="balance"
+              src="../assets/routine/icon-balance.svg"
+              alt=""
+              width="24"
+              height="24"
+            />
+            <img
+              class="routine-phase__icon"
+              data-phase="treat"
+              src="../assets/routine/icon-treat.svg"
+              alt=""
+              width="24"
+              height="24"
+            />
+            <img
+              class="routine-phase__icon"
+              data-phase="protect"
+              src="../assets/routine/icon-protect.svg"
+              alt=""
+              width="24"
+              height="24"
+            />
+          </div>
+
+          <button
+            class="routine-play"
+            type="button"
+            data-play
+            aria-label="Pause"
+          >
+            <span class="routine-play__icon" aria-hidden="true">
+              <img
+                class="routine-play__pause"
+                src="../assets/routine/icon-pause.svg"
+                alt=""
+                width="5"
+                height="9"
+              />
+              <img
+                class="routine-play__caret"
+                src="../assets/routine/icon-caret-right.svg"
+                alt=""
+                width="20"
+                height="20"
+              />
+            </span>
+          </button>
+
+          <div class="routine-product" aria-hidden="true">
+            <img
+              class="is-on"
+              data-product="cleanse"
+              src="../assets/routine/thumb-cleanse.png"
+              alt=""
+              width="1600"
+              height="2000"
+            />
+            <img
+              data-product="balance"
+              src="../assets/routine/thumb-balance.png"
+              alt=""
+              width="1600"
+              height="2000"
+            />
+            <img
+              data-product="treat"
+              src="../assets/routine/thumb-treat.png"
+              alt=""
+              width="1600"
+              height="2000"
+            />
+            <img
+              data-product="protect"
+              src="../assets/routine/thumb-protect.png"
+              alt=""
+              width="1600"
+              height="2000"
+            />
+          </div>
+        </div>
+
+        <div class="routine-aside">
+          <div class="routine-steps" role="tablist" aria-label="Routine steps">
+            <article class="routine-step is-open" data-step="cleanse">
+              <button
+                class="routine-step__head"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                aria-expanded="true"
+                aria-controls="routine-panel-cleanse"
+                id="routine-tab-cleanse"
+              >
+                <span class="routine-step__num">Step 1</span>
+                <span class="routine-step__title">Cleanse</span>
+                <span class="routine-step__plus" aria-hidden="true">
+                  <img
+                    src="../assets/routine/icon-plus.svg"
+                    alt=""
+                    width="20"
+                    height="20"
+                  />
+                </span>
+              </button>
+              <div
+                class="routine-step__body"
+                id="routine-panel-cleanse"
+                role="tabpanel"
+                aria-labelledby="routine-tab-cleanse"
+              >
+                <div class="routine-step__inner">
+                  <div class="routine-step__copy">
+                    <p>
+                      Good skin starts with a great cleanser. Our Soft Wash
+                      cleanser effectively dissolves excess oil, makeup, and
+                      impurities without stripping moisture, leaving the skin
+                      clean, soft, and balanced.
+                    </p>
+                    <p>
+                      Packed with exfoliating rice particles, fruit AHAs, and
+                      snow mushroom, this gentle, water-activated powder-to-foam
+                      facial cleanser purifies, balances, and brightens skin
+                      with every use.
+                    </p>
+                  </div>
+                  <button class="text-link routine-details" type="button">
+                    <span class="icon-box icon-box--arrow" aria-hidden="true">
+                      <img
+                        class="icon-arrow"
+                        src="../assets/routine/icon-arrow.svg"
+                        alt=""
+                        width="12.226"
+                        height="9"
+                      />
+                    </span>
+                    Product Details
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <article class="routine-step" data-step="balance">
+              <button
+                class="routine-step__head"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                aria-expanded="false"
+                aria-controls="routine-panel-balance"
+                id="routine-tab-balance"
+              >
+                <span class="routine-step__num">Step 2</span>
+                <span class="routine-step__title">Balance</span>
+                <span class="routine-step__plus" aria-hidden="true">
+                  <img
+                    src="../assets/routine/icon-plus.svg"
+                    alt=""
+                    width="20"
+                    height="20"
+                  />
+                </span>
+              </button>
+              <div
+                class="routine-step__body"
+                id="routine-panel-balance"
+                role="tabpanel"
+                aria-labelledby="routine-tab-balance"
+              >
+                <div class="routine-step__inner">
+                  <div class="routine-step__copy">
+                    <p>
+                      Good skin starts with a great cleanser. Our Soft Wash
+                      cleanser effectively dissolves excess oil, makeup, and
+                      impurities without stripping moisture, leaving the skin
+                      clean, soft, and balanced.
+                    </p>
+                    <p>
+                      Packed with exfoliating rice particles, fruit AHAs, and
+                      snow mushroom, this gentle, water-activated powder-to-foam
+                      facial cleanser purifies, balances, and brightens skin
+                      with every use.
+                    </p>
+                  </div>
+                  <button class="text-link routine-details" type="button">
+                    <span class="icon-box icon-box--arrow" aria-hidden="true">
+                      <img
+                        class="icon-arrow"
+                        src="../assets/routine/icon-arrow.svg"
+                        alt=""
+                        width="12.226"
+                        height="9"
+                      />
+                    </span>
+                    Product Details
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <article class="routine-step" data-step="treat">
+              <button
+                class="routine-step__head"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                aria-expanded="false"
+                aria-controls="routine-panel-treat"
+                id="routine-tab-treat"
+              >
+                <span class="routine-step__num">Step 3</span>
+                <span class="routine-step__title">Treat</span>
+                <span class="routine-step__plus" aria-hidden="true">
+                  <img
+                    src="../assets/routine/icon-plus.svg"
+                    alt=""
+                    width="20"
+                    height="20"
+                  />
+                </span>
+              </button>
+              <div
+                class="routine-step__body"
+                id="routine-panel-treat"
+                role="tabpanel"
+                aria-labelledby="routine-tab-treat"
+              >
+                <div class="routine-step__inner">
+                  <div class="routine-step__copy">
+                    <p>
+                      Good skin starts with a great cleanser. Our Soft Wash
+                      cleanser effectively dissolves excess oil, makeup, and
+                      impurities without stripping moisture, leaving the skin
+                      clean, soft, and balanced.
+                    </p>
+                    <p>
+                      Packed with exfoliating rice particles, fruit AHAs, and
+                      snow mushroom, this gentle, water-activated powder-to-foam
+                      facial cleanser purifies, balances, and brightens skin
+                      with every use.
+                    </p>
+                  </div>
+                  <button class="text-link routine-details" type="button">
+                    <span class="icon-box icon-box--arrow" aria-hidden="true">
+                      <img
+                        class="icon-arrow"
+                        src="../assets/routine/icon-arrow.svg"
+                        alt=""
+                        width="12.226"
+                        height="9"
+                      />
+                    </span>
+                    Product Details
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <article class="routine-step" data-step="protect">
+              <button
+                class="routine-step__head"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                aria-expanded="false"
+                aria-controls="routine-panel-protect"
+                id="routine-tab-protect"
+              >
+                <span class="routine-step__num">Step 4</span>
+                <span class="routine-step__title">Protect</span>
+                <span class="routine-step__plus" aria-hidden="true">
+                  <img
+                    src="../assets/routine/icon-plus.svg"
+                    alt=""
+                    width="20"
+                    height="20"
+                  />
+                </span>
+              </button>
+              <div
+                class="routine-step__body"
+                id="routine-panel-protect"
+                role="tabpanel"
+                aria-labelledby="routine-tab-protect"
+              >
+                <div class="routine-step__inner">
+                  <div class="routine-step__copy">
+                    <p>
+                      Good skin starts with a great cleanser. Our Soft Wash
+                      cleanser effectively dissolves excess oil, makeup, and
+                      impurities without stripping moisture, leaving the skin
+                      clean, soft, and balanced.
+                    </p>
+                    <p>
+                      Packed with exfoliating rice particles, fruit AHAs, and
+                      snow mushroom, this gentle, water-activated powder-to-foam
+                      facial cleanser purifies, balances, and brightens skin
+                      with every use.
+                    </p>
+                  </div>
+                  <button class="text-link routine-details" type="button">
+                    <span class="icon-box icon-box--arrow" aria-hidden="true">
+                      <img
+                        class="icon-arrow"
+                        src="../assets/routine/icon-arrow.svg"
+                        alt=""
+                        width="12.226"
+                        height="9"
+                      />
+                    </span>
+                    Product Details
+                  </button>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="routine-thumbs" role="group" aria-label="Routine products">
+            <button
+              class="routine-thumb is-on"
+              type="button"
+              data-step="cleanse"
+              aria-pressed="true"
+              aria-label="Cleanse"
+            >
+              <img
+                src="../assets/routine/thumb-cleanse.png"
+                alt=""
+                width="1600"
+                height="2000"
+              />
+              <span class="routine-thumb__frost" aria-hidden="true"></span>
+            </button>
+            <button
+              class="routine-thumb"
+              type="button"
+              data-step="balance"
+              aria-pressed="false"
+              aria-label="Balance"
+            >
+              <img
+                src="../assets/routine/thumb-balance.png"
+                alt=""
+                width="1600"
+                height="2000"
+              />
+              <span class="routine-thumb__frost" aria-hidden="true"></span>
+            </button>
+            <button
+              class="routine-thumb"
+              type="button"
+              data-step="treat"
+              aria-pressed="false"
+              aria-label="Treat"
+            >
+              <img
+                src="../assets/routine/thumb-treat.png"
+                alt=""
+                width="1600"
+                height="2000"
+              />
+              <span class="routine-thumb__frost" aria-hidden="true"></span>
+            </button>
+            <button
+              class="routine-thumb"
+              type="button"
+              data-step="protect"
+              aria-pressed="false"
+              aria-label="Protect"
+            >
+              <img
+                src="../assets/routine/thumb-protect.png"
+                alt=""
+                width="1600"
+                height="2000"
+              />
+              <span class="routine-thumb__frost" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script src="../routine.js?v=7"></script>
+  </body>
+</html>
