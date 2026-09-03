@@ -23,6 +23,7 @@ let drag = null;
 let raf = 0;
 let suppressClick = false;
 let wheelAccum = 0;
+let wheelAxis = null;
 let wheelLock = false;
 let wheelReset = 0;
 let wheelUnlock = 0;
@@ -92,6 +93,14 @@ function goStep(next) {
   return true;
 }
 
+function goTab(next, { resetStep = true } = {}) {
+  const clamped = clamp(next, 0, TAB_ORDER.length - 1);
+  if (clamped === tabIndex) return false;
+  applyTab(clamped);
+  if (resetStep) applyStep(0);
+  return true;
+}
+
 function isDesktop() {
   return window.matchMedia(DESKTOP_MQ).matches;
 }
@@ -102,7 +111,7 @@ function isTypingTarget(target) {
   );
 }
 
-function wheelDeltaX(event) {
+function wheelDeltas(event) {
   let x = event.deltaX;
   let y = event.deltaY;
   if (event.deltaMode === 1) {
@@ -112,55 +121,73 @@ function wheelDeltaX(event) {
     x *= root.clientWidth;
     y *= root.clientHeight;
   }
-  if (event.shiftKey && Math.abs(x) < Math.abs(y)) return y;
-  return x;
+  if (event.shiftKey && Math.abs(x) < Math.abs(y)) {
+    return { x: y, y: 0 };
+  }
+  return { x, y };
 }
 
 function lockWheel() {
   wheelLock = true;
   wheelAccum = 0;
+  wheelAxis = null;
   window.clearTimeout(wheelUnlock);
   wheelUnlock = window.setTimeout(() => {
     wheelLock = false;
     wheelAccum = 0;
+    wheelAxis = null;
   }, WHEEL_LOCK_MS);
 }
 
 function onWheel(event) {
   if (drag) return;
 
-  const dx = event.deltaX;
-  const dy = event.deltaY;
-  const horizontal = wheelDeltaX(event);
-  const vertical = event.shiftKey ? 0 : dy;
+  const { x, y } = wheelDeltas(event);
+  const absX = Math.abs(x);
+  const absY = Math.abs(y);
+  if (absX < 1 && absY < 1) return;
 
-  if (Math.abs(horizontal) < 1) return;
-  if (!event.shiftKey && Math.abs(vertical) > Math.abs(dx) * 1.25) return;
+  const axis = absY > absX * 1.25 ? "y" : absX >= absY * 1.25 ? "x" : null;
+  if (!axis) return;
 
   event.preventDefault();
   if (wheelLock) return;
 
-  wheelAccum += horizontal;
+  if (wheelAxis && wheelAxis !== axis) wheelAccum = 0;
+  wheelAxis = axis;
+  wheelAccum += axis === "y" ? y : x;
+
   window.clearTimeout(wheelReset);
   wheelReset = window.setTimeout(() => {
     wheelAccum = 0;
+    wheelAxis = null;
   }, 80);
 
-  if (wheelAccum >= WHEEL_SNAP && goStep(step + 1)) {
-    lockWheel();
-  } else if (wheelAccum <= -WHEEL_SNAP && goStep(step - 1)) {
-    lockWheel();
+  if (axis === "y") {
+    if (wheelAccum >= WHEEL_SNAP && goTab(tabIndex + 1)) lockWheel();
+    else if (wheelAccum <= -WHEEL_SNAP && goTab(tabIndex - 1)) lockWheel();
+    return;
   }
+
+  if (wheelAccum >= WHEEL_SNAP && goStep(step + 1)) lockWheel();
+  else if (wheelAccum <= -WHEEL_SNAP && goStep(step - 1)) lockWheel();
 }
 
 function onKeydown(event) {
   if (!isDesktop()) return;
   if (event.metaKey || event.ctrlKey || event.altKey) return;
   if (isTypingTarget(event.target)) return;
-  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
 
-  event.preventDefault();
-  goStep(event.key === "ArrowRight" ? step + 1 : step - 1);
+  if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+    event.preventDefault();
+    goStep(event.key === "ArrowRight" ? step + 1 : step - 1);
+    return;
+  }
+
+  if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+    event.preventDefault();
+    goTab(event.key === "ArrowDown" ? tabIndex + 1 : tabIndex - 1);
+  }
 }
 
 function applyTab(next) {
@@ -212,6 +239,19 @@ function stepFromGesture(session, clientX) {
   return session.originStep;
 }
 
+function tabFromGesture(session, clientY) {
+  const releaseDy = clientY - session.originY;
+  const lastDy = session.lastY - session.originY;
+  const peakDy = session.peakDy;
+  const pointerDelta = [releaseDy, lastDy, peakDy].sort(
+    (a, b) => Math.abs(b) - Math.abs(a)
+  )[0];
+
+  if (pointerDelta <= -SNAP_PX) return session.originTab + 1;
+  if (pointerDelta >= SNAP_PX) return session.originTab - 1;
+  return session.originTab;
+}
+
 function finishDrag(event) {
   if (!drag || event.pointerId !== drag.id) return;
 
@@ -227,6 +267,13 @@ function finishDrag(event) {
   if (!session.moving) return;
 
   armClickSuppression();
+
+  if (session.axis === "y") {
+    const clientY = Number.isFinite(event.clientY) ? event.clientY : session.lastY;
+    goTab(tabFromGesture(session, clientY));
+    return;
+  }
+
   const clientX = Number.isFinite(event.clientX) ? event.clientX : session.lastX;
   applyStep(stepFromGesture(session, clientX));
 }
@@ -255,9 +302,13 @@ function onPointerDown(event) {
     originX: event.clientX,
     originY: event.clientY,
     lastX: event.clientX,
+    lastY: event.clientY,
     peakDx: 0,
+    peakDy: 0,
     originOffset: offsetX,
     originStep: step,
+    originTab: tabIndex,
+    axis: null,
     moving: false,
   };
 
@@ -274,18 +325,30 @@ function onPointerMove(event) {
 
   if (!drag.moving) {
     if (Math.hypot(deltaX, deltaY) < DRAG_THRESHOLD) return;
-    if (Math.abs(deltaY) > Math.abs(deltaX) * 1.75) {
-      const id = drag.id;
-      drag = null;
-      releaseCapture(id);
+
+    if (Math.abs(deltaY) > Math.abs(deltaX) * 1.25) {
+      drag.axis = "y";
+    } else if (Math.abs(deltaX) >= Math.abs(deltaY) * 1.25) {
+      drag.axis = "x";
+    } else {
       return;
     }
+
     drag.moving = true;
     stage.classList.add("is-dragging");
     row.style.transition = "none";
   }
 
   drag.lastX = event.clientX;
+  drag.lastY = event.clientY;
+
+  if (drag.axis === "y") {
+    const liveDy = event.clientY - drag.originY;
+    if (Math.abs(liveDy) >= Math.abs(drag.peakDy)) drag.peakDy = liveDy;
+    if (event.cancelable) event.preventDefault();
+    return;
+  }
+
   const liveDx = event.clientX - drag.originX;
   if (Math.abs(liveDx) >= Math.abs(drag.peakDx)) drag.peakDx = liveDx;
   if (event.cancelable) event.preventDefault();
@@ -293,7 +356,7 @@ function onPointerMove(event) {
 
   raf = requestAnimationFrame(() => {
     raf = 0;
-    if (!drag) return;
+    if (!drag || drag.axis !== "x") return;
     setOffset(drag.originOffset - (drag.lastX - drag.originX));
   });
 }
@@ -305,9 +368,8 @@ function onLostCapture(event) {
 
 function onTabClick(name) {
   const next = TAB_ORDER.indexOf(name);
-  if (next === tabIndex) return;
-  applyTab(next);
-  applyStep(0);
+  if (next < 0) return;
+  goTab(next);
 }
 
 root.querySelectorAll("img").forEach((img) => {
@@ -343,13 +405,11 @@ tabs.forEach((tab) => {
 });
 
 prevTab?.addEventListener("click", () => {
-  applyTab(tabIndex - 1);
-  applyStep(0);
+  goTab(tabIndex - 1);
 });
 
 nextTab?.addEventListener("click", () => {
-  applyTab(tabIndex + 1);
-  applyStep(0);
+  goTab(tabIndex + 1);
 });
 
 window.addEventListener("resize", () => {
