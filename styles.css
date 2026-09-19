@@ -86,6 +86,11 @@
   --community-title-col: 100%;
   --fly-duration: 720ms;
   --fly-ease: cubic-bezier(0.33, 0, 0.12, 1);
+  --community-fade: 460ms;
+  --community-fade-in: 640ms;
+  --community-stagger: 70ms;
+  --community-column: 300ms;
+  --community-column-step: 160ms;
 
   /* Skin stories (skin-stories.html) */
   --clinical-green: #289b1f;
@@ -996,7 +1001,8 @@ body.is-details-open {
 
 /* ==========================================================================
    Community — community.html
-   Portrait grid, detail overlay, FLIP morph into the left portrait slot.
+   Portrait grid, detail overlay. Desktop opens with a random fade out of
+   the grid, then the left column, center image, and right column.
    ========================================================================== */
 
 .community {
@@ -1544,6 +1550,10 @@ body.is-details-open {
     line-height: 1.3;
   }
 
+  .community-stage {
+    overflow: hidden;
+  }
+
   .community-detail {
     flex-direction: row;
     align-items: stretch;
@@ -1598,6 +1608,94 @@ body.is-details-open {
     margin-top: 0;
   }
 
+  .community-card {
+    transition: opacity var(--community-fade) var(--ease);
+  }
+
+  .community.is-exiting-grid .community-card,
+  .community.is-entering-grid .community-card {
+    opacity: 0;
+  }
+
+  .community.is-entering-grid .community-card {
+    transition: none;
+  }
+
+  .community.is-entering-grid.is-fade-ready .community-card {
+    transition: opacity var(--community-fade-in) var(--ease);
+  }
+
+  .community.is-entering-grid.is-grid-in .community-card {
+    opacity: 1;
+  }
+
+  .community.is-exiting-grid .community-grid,
+  .community.is-entering-detail .community-detail,
+  .community.is-exiting-detail .community-detail,
+  .community.is-entering-grid .community-grid,
+  .community[data-view="detail"] .community-grid {
+    transition: none;
+  }
+
+  .community.is-entering-detail[data-view="detail"] .community-detail,
+  .community.is-exiting-detail[data-view="detail"] .community-detail {
+    opacity: 1;
+  }
+
+  .community.is-entering-detail .detail-media,
+  .community.is-entering-detail .detail-info,
+  .community.is-entering-detail .detail-rail {
+    opacity: 0;
+    transition: none;
+  }
+
+  .community.is-entering-detail.is-fade-ready .detail-media,
+  .community.is-entering-detail.is-fade-ready .detail-info,
+  .community.is-entering-detail.is-fade-ready .detail-rail {
+    transition: opacity var(--community-column) var(--ease);
+  }
+
+  .community.is-entering-detail.is-left-in .detail-info,
+  .community.is-entering-detail.is-center-in .detail-media,
+  .community.is-entering-detail.is-right-in .detail-rail {
+    opacity: 1;
+  }
+
+  .community.is-entering-detail .detail-info,
+  .community.is-entering-detail .detail-media,
+  .community.is-entering-detail .detail-rail {
+    pointer-events: none;
+  }
+
+  .community.is-entering-detail.is-left-in .detail-info,
+  .community.is-entering-detail.is-center-in .detail-media,
+  .community.is-entering-detail.is-right-in .detail-rail {
+    pointer-events: auto;
+  }
+
+  .detail-media,
+  .detail-info,
+  .detail-rail {
+    transition: opacity var(--community-column) var(--ease);
+  }
+
+  .community.is-exiting-detail.is-right-out .detail-rail,
+  .community.is-exiting-detail.is-center-out .detail-media,
+  .community.is-exiting-detail.is-left-out .detail-info {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .community.is-entering-grid[data-view="grid"] .community-detail {
+    opacity: 0;
+    transition: none;
+  }
+
+  .community.is-entering-grid[data-view="grid"] .community-grid {
+    opacity: 1;
+    transition: none;
+  }
+
   .clinical {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1629,10 +1727,14 @@ body.is-details-open {
   /* Community motion — community.html */
   .community-grid,
   .community-detail,
+  .community-card,
   .community-fly,
   .detail-ticker__track,
   .detail-portrait img,
+  .detail-media,
   .detail-media > img,
+  .detail-info,
+  .detail-rail,
   .detail-meta__value {
     animation: none;
     transition: none;

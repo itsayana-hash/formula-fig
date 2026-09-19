@@ -253,62 +253,163 @@ function morph(fromRect, toRect, img, onDone) {
   });
 }
 
-function openDetail(i) {
+function sleep(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+function motionMs(name, fallback) {
+  return cssTimeMs(name, fallback);
+}
+
+function clearCardDelays() {
+  cards.forEach((card) => {
+    card.style.transitionDelay = "";
+  });
+}
+
+function randomCardDelays() {
+  const stagger = motionMs("--community-stagger", 70);
+  const order = cards.map((_, i) => i);
+  for (let i = order.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const swap = order[i];
+    order[i] = order[j];
+    order[j] = swap;
+  }
+  order.forEach((cardIndex, step) => {
+    cards[cardIndex].style.transitionDelay = `${step * stagger}ms`;
+  });
+  return (cards.length - 1) * stagger;
+}
+
+function clearViewMotion() {
+  community.classList.remove(
+    "is-exiting-grid",
+    "is-entering-detail",
+    "is-fade-ready",
+    "is-left-in",
+    "is-center-in",
+    "is-right-in",
+    "is-right-out",
+    "is-center-out",
+    "is-left-out",
+    "is-exiting-detail",
+    "is-entering-grid",
+    "is-grid-in"
+  );
+  clearCardDelays();
+}
+
+async function openDetail(i) {
   if (isDetail()) return;
 
   const token = ++viewGen;
   cancelMorph();
+  clearViewMotion();
+  community.classList.remove("is-switching");
 
-  const card = cards[i];
-  const cardImg = card.querySelector(":scope > img");
-  const fromRect = card.getBoundingClientRect();
-  card.classList.add("is-origin");
   applyMember(i, { silent: true });
-  setView("detail");
-
-  const finishOpen = () => {
-    if (token !== viewGen) return;
-    pauseBtn.focus();
-  };
 
   if (!isDesktop() || reduceMotion()) {
-    card.classList.remove("is-origin");
-    finishOpen();
+    setView("detail");
+    pauseBtn.focus();
     return;
   }
 
-  afterTwoFrames(() => {
-    if (token !== viewGen || !isDetail()) return;
-    const toRect = portraitEl.parentElement.getBoundingClientRect();
-    morph(fromRect, toRect, cardImg, finishOpen);
-  });
+  const cardSpan = randomCardDelays();
+  community.classList.add("is-exiting-grid");
+  await sleep(cardSpan + motionMs("--community-fade", 460));
+  if (token !== viewGen) return;
+
+  setView("detail");
+  community.classList.remove("is-exiting-grid");
+  clearCardDelays();
+  community.classList.add("is-entering-detail");
+  await new Promise((resolve) => afterTwoFrames(resolve));
+  if (token !== viewGen) return;
+
+  community.classList.add("is-fade-ready");
+  await new Promise((resolve) => afterTwoFrames(resolve));
+  if (token !== viewGen) return;
+
+  const columnFade = motionMs("--community-column", 300);
+  const columnStep = motionMs("--community-column-step", 160);
+  community.classList.add("is-left-in");
+  await sleep(columnStep);
+  if (token !== viewGen) return;
+
+  community.classList.add("is-center-in");
+  await sleep(columnStep);
+  if (token !== viewGen) return;
+
+  community.classList.add("is-right-in");
+  await sleep(columnFade);
+  if (token !== viewGen) return;
+
+  community.classList.remove(
+    "is-entering-detail",
+    "is-fade-ready",
+    "is-left-in",
+    "is-center-in",
+    "is-right-in"
+  );
+  pauseBtn.focus();
 }
 
-function closeDetail() {
+async function closeDetail() {
   if (!isDetail()) return;
 
   const token = ++viewGen;
-
-  const card = cards[index];
-  const fromRect = portraitEl.parentElement.getBoundingClientRect();
-  const toRect = card.getBoundingClientRect();
-
-  card.classList.add("is-origin");
-  setView("grid");
+  cancelMorph();
+  clearViewMotion();
   community.classList.remove("is-paused", "is-switching");
 
-  const finishClose = () => {
-    if (token !== viewGen) return;
-    card.querySelector(".media-control")?.focus();
-  };
+  const card = cards[index];
 
   if (!isDesktop() || reduceMotion()) {
-    cancelMorph();
-    finishClose();
+    setView("grid");
+    card.querySelector(".media-control")?.focus();
     return;
   }
 
-  morph(fromRect, toRect, portraitEl, finishClose);
+  const columnFade = motionMs("--community-column", 300);
+  const columnStep = motionMs("--community-column-step", 160);
+  community.classList.add("is-exiting-detail", "is-right-out");
+  await sleep(columnStep);
+  if (token !== viewGen) return;
+
+  community.classList.add("is-center-out");
+  await sleep(columnStep);
+  if (token !== viewGen) return;
+
+  community.classList.add("is-left-out");
+  await sleep(columnFade);
+  if (token !== viewGen) return;
+
+  setView("grid");
+  community.classList.remove(
+    "is-exiting-detail",
+    "is-right-out",
+    "is-center-out",
+    "is-left-out"
+  );
+  const cardSpan = randomCardDelays();
+  community.classList.add("is-entering-grid");
+  await new Promise((resolve) => afterTwoFrames(resolve));
+  if (token !== viewGen) return;
+
+  community.classList.add("is-fade-ready");
+  await new Promise((resolve) => afterTwoFrames(resolve));
+  if (token !== viewGen) return;
+
+  community.classList.add("is-grid-in");
+  await sleep(cardSpan + motionMs("--community-fade-in", 640));
+  if (token !== viewGen) return;
+
+  community.classList.remove("is-entering-grid", "is-fade-ready", "is-grid-in");
+  card.querySelector(".media-control")?.focus();
 }
 
 renderThumbs();
