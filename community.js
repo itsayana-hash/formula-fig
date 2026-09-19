@@ -295,6 +295,10 @@ function clearViewMotion() {
     "is-right-out",
     "is-center-out",
     "is-left-out",
+    "is-top-in",
+    "is-bottom-in",
+    "is-bottom-out",
+    "is-top-out",
     "is-exiting-detail",
     "is-entering-grid",
     "is-grid-in"
@@ -312,7 +316,7 @@ async function openDetail(i) {
 
   applyMember(i, { silent: true });
 
-  if (!isDesktop() || reduceMotion()) {
+  if (reduceMotion()) {
     setView("detail");
     pauseBtn.focus();
     return;
@@ -336,25 +340,44 @@ async function openDetail(i) {
 
   const columnFade = motionMs("--community-column", 300);
   const columnStep = motionMs("--community-column-step", 160);
-  community.classList.add("is-left-in");
-  await sleep(columnStep);
-  if (token !== viewGen) return;
 
-  community.classList.add("is-center-in");
-  await sleep(columnStep);
-  if (token !== viewGen) return;
+  if (isDesktop()) {
+    community.classList.add("is-left-in");
+    await sleep(columnStep);
+    if (token !== viewGen) return;
 
-  community.classList.add("is-right-in");
-  await sleep(columnFade);
-  if (token !== viewGen) return;
+    community.classList.add("is-center-in");
+    await sleep(columnStep);
+    if (token !== viewGen) return;
 
-  community.classList.remove(
-    "is-entering-detail",
-    "is-fade-ready",
-    "is-left-in",
-    "is-center-in",
-    "is-right-in"
-  );
+    community.classList.add("is-right-in");
+    await sleep(columnFade);
+    if (token !== viewGen) return;
+
+    community.classList.remove(
+      "is-entering-detail",
+      "is-fade-ready",
+      "is-left-in",
+      "is-center-in",
+      "is-right-in"
+    );
+  } else {
+    community.classList.add("is-top-in");
+    await sleep(columnStep);
+    if (token !== viewGen) return;
+
+    community.classList.add("is-bottom-in");
+    await sleep(columnFade);
+    if (token !== viewGen) return;
+
+    community.classList.remove(
+      "is-entering-detail",
+      "is-fade-ready",
+      "is-top-in",
+      "is-bottom-in"
+    );
+  }
+
   pauseBtn.focus();
 }
 
@@ -368,7 +391,7 @@ async function closeDetail() {
 
   const card = cards[index];
 
-  if (!isDesktop() || reduceMotion()) {
+  if (reduceMotion()) {
     setView("grid");
     card.querySelector(".media-control")?.focus();
     return;
@@ -376,25 +399,43 @@ async function closeDetail() {
 
   const columnFade = motionMs("--community-column", 300);
   const columnStep = motionMs("--community-column-step", 160);
-  community.classList.add("is-exiting-detail", "is-right-out");
-  await sleep(columnStep);
-  if (token !== viewGen) return;
 
-  community.classList.add("is-center-out");
-  await sleep(columnStep);
-  if (token !== viewGen) return;
+  if (isDesktop()) {
+    community.classList.add("is-exiting-detail", "is-right-out");
+    await sleep(columnStep);
+    if (token !== viewGen) return;
 
-  community.classList.add("is-left-out");
-  await sleep(columnFade);
-  if (token !== viewGen) return;
+    community.classList.add("is-center-out");
+    await sleep(columnStep);
+    if (token !== viewGen) return;
+
+    community.classList.add("is-left-out");
+    await sleep(columnFade);
+    if (token !== viewGen) return;
+
+    community.classList.remove(
+      "is-exiting-detail",
+      "is-right-out",
+      "is-center-out",
+      "is-left-out"
+    );
+  } else {
+    community.classList.add("is-exiting-detail", "is-bottom-out");
+    await sleep(columnStep);
+    if (token !== viewGen) return;
+
+    community.classList.add("is-top-out");
+    await sleep(columnFade);
+    if (token !== viewGen) return;
+
+    community.classList.remove(
+      "is-exiting-detail",
+      "is-bottom-out",
+      "is-top-out"
+    );
+  }
 
   setView("grid");
-  community.classList.remove(
-    "is-exiting-detail",
-    "is-right-out",
-    "is-center-out",
-    "is-left-out"
-  );
   const cardSpan = randomCardDelays();
   community.classList.add("is-entering-grid");
   await new Promise((resolve) => afterTwoFrames(resolve));

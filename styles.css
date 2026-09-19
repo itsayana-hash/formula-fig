@@ -1001,8 +1001,9 @@ body.is-details-open {
 
 /* ==========================================================================
    Community — community.html
-   Portrait grid, detail overlay. Desktop opens with a random fade out of
-   the grid, then the left column, center image, and right column.
+   Portrait grid, detail overlay. Grid cards fade in a random order.
+   Desktop detail: left → center → right (reverse on close).
+   Mobile detail: top (media) → bottom (ticker + rail); reverse on close.
    ========================================================================== */
 
 .community {
@@ -1372,6 +1373,88 @@ body.is-details-open {
   transition: opacity var(--copy-duration) var(--ease);
 }
 
+/* Community view transitions — shared grid fade (mobile + desktop) */
+.community-card {
+  transition: opacity var(--community-fade) var(--ease);
+}
+
+.community.is-exiting-grid .community-card,
+.community.is-entering-grid .community-card {
+  opacity: 0;
+}
+
+.community.is-entering-grid .community-card {
+  transition: none;
+}
+
+.community.is-entering-grid.is-fade-ready .community-card {
+  transition: opacity var(--community-fade-in) var(--ease);
+}
+
+.community.is-entering-grid.is-grid-in .community-card {
+  opacity: 1;
+}
+
+.community.is-exiting-grid .community-grid,
+.community.is-entering-detail .community-detail,
+.community.is-exiting-detail .community-detail,
+.community.is-entering-grid .community-grid,
+.community[data-view="detail"] .community-grid {
+  transition: none;
+}
+
+.community.is-entering-detail[data-view="detail"] .community-detail,
+.community.is-exiting-detail[data-view="detail"] .community-detail {
+  opacity: 1;
+}
+
+.community.is-entering-grid[data-view="grid"] .community-detail {
+  opacity: 0;
+  transition: none;
+}
+
+.community.is-entering-grid[data-view="grid"] .community-grid {
+  opacity: 1;
+  transition: none;
+}
+
+/* Mobile detail: top (hero) then bottom (ticker + rail) */
+@media (max-width: 859px) {
+  .community.is-entering-detail .detail-media,
+  .community.is-entering-detail .detail-ticker,
+  .community.is-entering-detail .detail-rail {
+    opacity: 0;
+    transition: none;
+    pointer-events: none;
+  }
+
+  .community.is-entering-detail.is-fade-ready .detail-media,
+  .community.is-entering-detail.is-fade-ready .detail-ticker,
+  .community.is-entering-detail.is-fade-ready .detail-rail {
+    transition: opacity var(--community-column) var(--ease);
+  }
+
+  .community.is-entering-detail.is-top-in .detail-media,
+  .community.is-entering-detail.is-bottom-in .detail-ticker,
+  .community.is-entering-detail.is-bottom-in .detail-rail {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .detail-media,
+  .detail-ticker,
+  .detail-rail {
+    transition: opacity var(--community-column) var(--ease);
+  }
+
+  .community.is-exiting-detail.is-bottom-out .detail-ticker,
+  .community.is-exiting-detail.is-bottom-out .detail-rail,
+  .community.is-exiting-detail.is-top-out .detail-media {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
 /* --------------------------------------------------------------------------
    Skin stories — skin-stories.html
    -------------------------------------------------------------------------- */
@@ -1608,40 +1691,7 @@ body.is-details-open {
     margin-top: 0;
   }
 
-  .community-card {
-    transition: opacity var(--community-fade) var(--ease);
-  }
-
-  .community.is-exiting-grid .community-card,
-  .community.is-entering-grid .community-card {
-    opacity: 0;
-  }
-
-  .community.is-entering-grid .community-card {
-    transition: none;
-  }
-
-  .community.is-entering-grid.is-fade-ready .community-card {
-    transition: opacity var(--community-fade-in) var(--ease);
-  }
-
-  .community.is-entering-grid.is-grid-in .community-card {
-    opacity: 1;
-  }
-
-  .community.is-exiting-grid .community-grid,
-  .community.is-entering-detail .community-detail,
-  .community.is-exiting-detail .community-detail,
-  .community.is-entering-grid .community-grid,
-  .community[data-view="detail"] .community-grid {
-    transition: none;
-  }
-
-  .community.is-entering-detail[data-view="detail"] .community-detail,
-  .community.is-exiting-detail[data-view="detail"] .community-detail {
-    opacity: 1;
-  }
-
+  /* Desktop detail: left → center → right (reverse on close) */
   .community.is-entering-detail .detail-media,
   .community.is-entering-detail .detail-info,
   .community.is-entering-detail .detail-rail {
@@ -1686,16 +1736,6 @@ body.is-details-open {
     pointer-events: none;
   }
 
-  .community.is-entering-grid[data-view="grid"] .community-detail {
-    opacity: 0;
-    transition: none;
-  }
-
-  .community.is-entering-grid[data-view="grid"] .community-grid {
-    opacity: 1;
-    transition: none;
-  }
-
   .clinical {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1734,6 +1774,7 @@ body.is-details-open {
   .detail-media,
   .detail-media > img,
   .detail-info,
+  .detail-ticker,
   .detail-rail,
   .detail-meta__value {
     animation: none;
