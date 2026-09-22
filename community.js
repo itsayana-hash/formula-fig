@@ -29,12 +29,12 @@ const members = cards.map((card) => {
 
 let index = 0;
 let playing = true;
-let copyTimer = 0;
 let flyEl = null;
 let morphGen = 0;
 let morphTimer = 0;
 let morphing = false;
 let viewGen = 0;
+let switchGen = 0;
 
 function reduceMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -59,10 +59,6 @@ function cssTimeMs(name, fallback) {
 
 function flyDurationMs() {
   return cssTimeMs("--fly-duration", 720);
-}
-
-function copyDurationMs() {
-  return cssTimeMs("--copy-duration", 500);
 }
 
 function memberAt(i) {
@@ -96,46 +92,171 @@ function renderThumbs() {
   );
 }
 
-function applyMember(i, { silent = false } = {}) {
+function writeMember(i) {
   const member = memberAt(i);
-  const fade = !silent && isDetail() && !reduceMotion();
+  index = i;
+  const cardImg = cards[i].querySelector(":scope > img");
+  portraitEl.src = member.portrait;
+  portraitEl.width = Number(member.width);
+  portraitEl.height = Number(member.height);
+  portraitEl.style.objectPosition = getComputedStyle(cardImg).objectPosition;
+  heroEl.src = member.hero;
+  heroEl.alt = member.alt;
+  detailsEl.textContent = member.details;
+  figbarEl.textContent = member.figbar;
+  tickerDetails.forEach((el) => {
+    el.textContent = member.details;
+  });
+  tickerFigbar.forEach((el) => {
+    el.textContent = member.figbar;
+  });
+  community.dataset.index = String(i);
+  thumbsRoot.querySelectorAll(".detail-thumb").forEach((thumb, t) => {
+    const selected = t === i;
+    thumb.classList.toggle("is-selected", selected);
+    thumb.setAttribute("aria-pressed", selected ? "true" : "false");
+  });
+}
 
-  const write = () => {
-    index = i;
-    const cardImg = cards[i].querySelector(":scope > img");
-    portraitEl.src = member.portrait;
-    portraitEl.width = Number(member.width);
-    portraitEl.height = Number(member.height);
-    portraitEl.style.objectPosition = getComputedStyle(cardImg).objectPosition;
-    heroEl.src = member.hero;
-    heroEl.alt = member.alt;
-    detailsEl.textContent = member.details;
-    figbarEl.textContent = member.figbar;
-    tickerDetails.forEach((el) => {
-      el.textContent = member.details;
-    });
-    tickerFigbar.forEach((el) => {
-      el.textContent = member.figbar;
-    });
-    community.dataset.index = String(i);
-    thumbsRoot.querySelectorAll(".detail-thumb").forEach((thumb, t) => {
-      const selected = t === i;
-      thumb.classList.toggle("is-selected", selected);
-      thumb.setAttribute("aria-pressed", selected ? "true" : "false");
-    });
-  };
+function applyMember(i, { silent = false } = {}) {
+  if (!silent && isDetail() && !reduceMotion()) {
+    switchMember(i);
+    return;
+  }
+  writeMember(i);
+}
 
-  if (!fade) {
-    write();
+async function switchMember(i) {
+  if (!isDetail()) {
+    writeMember(i);
+    return;
+  }
+  if (i === index) return;
+  if (reduceMotion()) {
+    writeMember(i);
     return;
   }
 
-  community.classList.add("is-switching");
-  window.clearTimeout(copyTimer);
-  copyTimer = window.setTimeout(() => {
-    write();
-    community.classList.remove("is-switching");
-  }, copyDurationMs() / 2);
+  const token = ++switchGen;
+  viewGen += 1;
+  clearViewMotion();
+  community.classList.add("is-switching", "is-switching-member");
+
+  const alive = () => token === switchGen && isDetail();
+  const columnFade = motionMs("--community-column", 300);
+
+  const finish = () => {
+    community.classList.remove(
+      "is-switching",
+      "is-switching-member",
+      "is-exiting-detail",
+      "is-entering-detail",
+      "is-fade-ready",
+      "is-left-in",
+      "is-center-in",
+      "is-right-in",
+      "is-right-out",
+      "is-center-out",
+      "is-left-out",
+      "is-top-in",
+      "is-bottom-in",
+      "is-top-out",
+      "is-bottom-out"
+    );
+  };
+
+  // Fade out: desktop right → left, mobile top → bottom
+  community.classList.add("is-exiting-detail");
+  if (isDesktop()) {
+    community.classList.add("is-right-out");
+    await sleep(columnFade);
+    if (!alive()) {
+      finish();
+      return;
+    }
+    community.classList.add("is-center-out");
+    await sleep(columnFade);
+    if (!alive()) {
+      finish();
+      return;
+    }
+    community.classList.add("is-left-out");
+    await sleep(columnFade);
+    if (!alive()) {
+      finish();
+      return;
+    }
+  } else {
+    community.classList.add("is-top-out");
+    await sleep(columnFade);
+    if (!alive()) {
+      finish();
+      return;
+    }
+    community.classList.add("is-bottom-out");
+    await sleep(columnFade);
+    if (!alive()) {
+      finish();
+      return;
+    }
+  }
+
+  writeMember(i);
+
+  // Hold hidden, then fade in: desktop left → right, mobile top → bottom
+  community.classList.remove(
+    "is-exiting-detail",
+    "is-right-out",
+    "is-center-out",
+    "is-left-out",
+    "is-top-out",
+    "is-bottom-out"
+  );
+  community.classList.add("is-entering-detail");
+  await new Promise((resolve) => afterTwoFrames(resolve));
+  if (!alive()) {
+    finish();
+    return;
+  }
+
+  community.classList.add("is-fade-ready");
+  await new Promise((resolve) => afterTwoFrames(resolve));
+  if (!alive()) {
+    finish();
+    return;
+  }
+
+  if (isDesktop()) {
+    community.classList.add("is-left-in");
+    await sleep(columnFade);
+    if (!alive()) {
+      finish();
+      return;
+    }
+    community.classList.add("is-center-in");
+    await sleep(columnFade);
+    if (!alive()) {
+      finish();
+      return;
+    }
+    community.classList.add("is-right-in");
+    await sleep(columnFade);
+  } else {
+    community.classList.add("is-top-in");
+    await sleep(columnFade);
+    if (!alive()) {
+      finish();
+      return;
+    }
+    community.classList.add("is-bottom-in");
+    await sleep(columnFade);
+  }
+
+  if (!alive()) {
+    finish();
+    return;
+  }
+  finish();
 }
 
 function setPlaying(next) {
@@ -301,20 +422,143 @@ function clearViewMotion() {
     "is-top-out",
     "is-exiting-detail",
     "is-entering-grid",
-    "is-grid-in"
+    "is-grid-in",
+    "is-switching-member"
   );
   clearCardDelays();
+}
+
+async function revealDetailColumns(alive) {
+  community.classList.remove(
+    "is-exiting-detail",
+    "is-right-out",
+    "is-center-out",
+    "is-left-out",
+    "is-bottom-out",
+    "is-top-out",
+    "is-left-in",
+    "is-center-in",
+    "is-right-in",
+    "is-top-in",
+    "is-bottom-in"
+  );
+  community.classList.add("is-entering-detail");
+  await new Promise((resolve) => afterTwoFrames(resolve));
+  if (!alive()) return false;
+
+  community.classList.add("is-fade-ready");
+  await new Promise((resolve) => afterTwoFrames(resolve));
+  if (!alive()) return false;
+
+  const columnFade = motionMs("--community-column", 300);
+  const columnStep = motionMs("--community-column-step", 160);
+
+  if (isDesktop()) {
+    community.classList.add("is-left-in");
+    await sleep(columnStep);
+    if (!alive()) return false;
+
+    community.classList.add("is-center-in");
+    await sleep(columnStep);
+    if (!alive()) return false;
+
+    community.classList.add("is-right-in");
+    await sleep(columnFade);
+    if (!alive()) return false;
+
+    community.classList.remove(
+      "is-entering-detail",
+      "is-fade-ready",
+      "is-left-in",
+      "is-center-in",
+      "is-right-in"
+    );
+  } else {
+    community.classList.add("is-top-in");
+    await sleep(columnStep);
+    if (!alive()) return false;
+
+    community.classList.add("is-bottom-in");
+    await sleep(columnFade);
+    if (!alive()) return false;
+
+    community.classList.remove(
+      "is-entering-detail",
+      "is-fade-ready",
+      "is-top-in",
+      "is-bottom-in"
+    );
+  }
+
+  return true;
+}
+
+async function concealDetailColumns(alive, { holdHidden = false } = {}) {
+  community.classList.remove(
+    "is-entering-detail",
+    "is-fade-ready",
+    "is-left-in",
+    "is-center-in",
+    "is-right-in",
+    "is-top-in",
+    "is-bottom-in"
+  );
+
+  const columnFade = motionMs("--community-column", 300);
+  const columnStep = motionMs("--community-column-step", 160);
+
+  if (isDesktop()) {
+    community.classList.add("is-exiting-detail", "is-right-out");
+    await sleep(columnStep);
+    if (!alive()) return false;
+
+    community.classList.add("is-center-out");
+    await sleep(columnStep);
+    if (!alive()) return false;
+
+    community.classList.add("is-left-out");
+    await sleep(columnFade);
+    if (!alive()) return false;
+
+    if (!holdHidden) {
+      community.classList.remove(
+        "is-exiting-detail",
+        "is-right-out",
+        "is-center-out",
+        "is-left-out"
+      );
+    }
+  } else {
+    community.classList.add("is-exiting-detail", "is-bottom-out");
+    await sleep(columnStep);
+    if (!alive()) return false;
+
+    community.classList.add("is-top-out");
+    await sleep(columnFade);
+    if (!alive()) return false;
+
+    if (!holdHidden) {
+      community.classList.remove(
+        "is-exiting-detail",
+        "is-bottom-out",
+        "is-top-out"
+      );
+    }
+  }
+
+  return true;
 }
 
 async function openDetail(i) {
   if (isDetail()) return;
 
   const token = ++viewGen;
+  switchGen += 1;
   cancelMorph();
   clearViewMotion();
   community.classList.remove("is-switching");
 
-  applyMember(i, { silent: true });
+  writeMember(i);
 
   if (reduceMotion()) {
     setView("detail");
@@ -330,53 +574,9 @@ async function openDetail(i) {
   setView("detail");
   community.classList.remove("is-exiting-grid");
   clearCardDelays();
-  community.classList.add("is-entering-detail");
-  await new Promise((resolve) => afterTwoFrames(resolve));
-  if (token !== viewGen) return;
 
-  community.classList.add("is-fade-ready");
-  await new Promise((resolve) => afterTwoFrames(resolve));
-  if (token !== viewGen) return;
-
-  const columnFade = motionMs("--community-column", 300);
-  const columnStep = motionMs("--community-column-step", 160);
-
-  if (isDesktop()) {
-    community.classList.add("is-left-in");
-    await sleep(columnStep);
-    if (token !== viewGen) return;
-
-    community.classList.add("is-center-in");
-    await sleep(columnStep);
-    if (token !== viewGen) return;
-
-    community.classList.add("is-right-in");
-    await sleep(columnFade);
-    if (token !== viewGen) return;
-
-    community.classList.remove(
-      "is-entering-detail",
-      "is-fade-ready",
-      "is-left-in",
-      "is-center-in",
-      "is-right-in"
-    );
-  } else {
-    community.classList.add("is-top-in");
-    await sleep(columnStep);
-    if (token !== viewGen) return;
-
-    community.classList.add("is-bottom-in");
-    await sleep(columnFade);
-    if (token !== viewGen) return;
-
-    community.classList.remove(
-      "is-entering-detail",
-      "is-fade-ready",
-      "is-top-in",
-      "is-bottom-in"
-    );
-  }
+  const revealed = await revealDetailColumns(() => token === viewGen && isDetail());
+  if (!revealed) return;
 
   pauseBtn.focus();
 }
@@ -385,6 +585,7 @@ async function closeDetail() {
   if (!isDetail()) return;
 
   const token = ++viewGen;
+  switchGen += 1;
   cancelMorph();
   clearViewMotion();
   community.classList.remove("is-paused", "is-switching");
@@ -397,43 +598,8 @@ async function closeDetail() {
     return;
   }
 
-  const columnFade = motionMs("--community-column", 300);
-  const columnStep = motionMs("--community-column-step", 160);
-
-  if (isDesktop()) {
-    community.classList.add("is-exiting-detail", "is-right-out");
-    await sleep(columnStep);
-    if (token !== viewGen) return;
-
-    community.classList.add("is-center-out");
-    await sleep(columnStep);
-    if (token !== viewGen) return;
-
-    community.classList.add("is-left-out");
-    await sleep(columnFade);
-    if (token !== viewGen) return;
-
-    community.classList.remove(
-      "is-exiting-detail",
-      "is-right-out",
-      "is-center-out",
-      "is-left-out"
-    );
-  } else {
-    community.classList.add("is-exiting-detail", "is-bottom-out");
-    await sleep(columnStep);
-    if (token !== viewGen) return;
-
-    community.classList.add("is-top-out");
-    await sleep(columnFade);
-    if (token !== viewGen) return;
-
-    community.classList.remove(
-      "is-exiting-detail",
-      "is-bottom-out",
-      "is-top-out"
-    );
-  }
+  const concealed = await concealDetailColumns(() => token === viewGen && isDetail());
+  if (!concealed) return;
 
   setView("grid");
   const cardSpan = randomCardDelays();

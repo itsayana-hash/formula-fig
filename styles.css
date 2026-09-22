@@ -1361,12 +1361,6 @@ body.is-details-open {
   margin-top: 20px;
 }
 
-.community.is-switching .detail-portrait img,
-.community.is-switching .detail-media > img,
-.community.is-switching .detail-meta__value {
-  opacity: 0;
-}
-
 .detail-portrait img,
 .detail-media > img,
 .detail-meta__value {
