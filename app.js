@@ -119,7 +119,7 @@ function reduceMotion() {
 function copyDelay() {
   if (reduceMotion()) return 0;
   const raw = getComputedStyle(highlight).getPropertyValue("--copy-duration");
-  return Number.parseFloat(raw) || 280;
+  return Number.parseFloat(raw) || 500;
 }
 
 function currentKey() {
@@ -251,6 +251,7 @@ function setStep(next) {
   copyTimer = window.setTimeout(() => {
     renderCopy();
     renderAdded();
+    highlight.dataset.copyStep = next;
     requestAnimationFrame(() => {
       highlight.classList.remove("is-switching");
     });

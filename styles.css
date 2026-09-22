@@ -55,7 +55,7 @@
 
   --duration: 700ms;
   --ease: cubic-bezier(0.45, 0, 0.15, 1);
-  --copy-duration: 280ms; /* product highlight default; community overrides below */
+  --copy-duration: 500ms; /* product highlight + community copy fades */
 
   /* Product highlight (product-highlight.html) */
   --panel-pad: 10px;
@@ -111,7 +111,7 @@
   --reveal-y: 50%;
 }
 
-/* Community uses a slower copy fade than product highlight */
+/* Community matches the product-highlight copy fade timing */
 .community {
   --copy-duration: 500ms;
 }
@@ -361,10 +361,11 @@ img {
 .identity,
 .mini-copy,
 .thumb img {
-  transition: opacity var(--copy-duration) var(--ease);
+  transition: opacity var(--copy-duration) ease;
 }
 
 .highlight.is-switching .identity,
+.highlight.is-switching .links,
 .highlight.is-switching .mini-copy,
 .highlight.is-switching .thumb img {
   opacity: 0;
@@ -394,10 +395,10 @@ h1 {
   display: flex;
   align-items: center;
   gap: 0;
-  transition: gap var(--duration) var(--ease);
+  transition: opacity var(--copy-duration) ease;
 }
 
-.highlight:not([data-step="set"]) .links {
+.highlight:not([data-copy-step="set"]) .links {
   gap: 20px;
 }
 
@@ -417,18 +418,12 @@ h1 {
 }
 
 .highlight .view-all {
-  max-width: 0;
-  opacity: 0;
-  overflow: hidden;
+  display: none;
   pointer-events: none;
-  transition:
-    max-width var(--duration) var(--ease),
-    opacity var(--duration) var(--ease);
 }
 
-.highlight:not([data-step="set"]) .view-all {
-  max-width: 120px;
-  opacity: 1;
+.highlight:not([data-copy-step="set"]) .view-all {
+  display: inline-flex;
   pointer-events: auto;
 }
 
