@@ -193,22 +193,6 @@ body:has(.routine) {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.routine-step.is-open::after {
-  content: "";
-  position: absolute;
-  top: var(--routine-step-y);
-  right: 0;
-  z-index: 2;
-  width: 30px;
-  height: 30px;
-  background-color: #f4f4f4;
-  background-image: url("assets/routine/icon-plus.svg");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 20px 20px;
-  pointer-events: none;
-}
-
 .routine-step__head {
   display: grid;
   grid-template-columns: 89px minmax(0, 1fr);
@@ -216,7 +200,6 @@ body:has(.routine) {
   align-items: center;
   width: 100%;
   min-height: 30px;
-  padding-right: 40px;
   column-gap: 0;
   text-align: left;
   cursor: pointer;
@@ -243,10 +226,6 @@ body:has(.routine) {
   .routine-step:not(.is-open) .routine-step__head:hover .routine-step__title {
     color: var(--clinical-green);
   }
-}
-
-.routine-step__plus {
-  display: none;
 }
 
 .routine-step__body {
@@ -390,10 +369,6 @@ body:has(.routine) {
 
   .routine-step__title {
     flex: 1 1 auto;
-  }
-
-  .routine-step__plus {
-    flex: 0 0 30px;
   }
 
   .routine-step__inner {
