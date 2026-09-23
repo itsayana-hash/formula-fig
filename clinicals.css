@@ -354,6 +354,33 @@ body:has(.clinicals) {
   width: 100%;
   overflow: visible;
   padding: 20px 40px 10px 10px;
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  transition:
+    opacity 350ms ease,
+    transform 350ms ease;
+  transition-delay: 0ms;
+}
+
+.clinicals.is-cards-ready .clinicals-stat {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.clinicals.is-cards-ready .clinicals-stat:nth-child(1) {
+  transition-delay: 0ms;
+}
+
+.clinicals.is-cards-ready .clinicals-stat:nth-child(2) {
+  transition-delay: 50ms;
+}
+
+.clinicals.is-cards-ready .clinicals-stat:nth-child(3) {
+  transition-delay: 100ms;
+}
+
+.clinicals.is-cards-ready .clinicals-stat:nth-child(4) {
+  transition-delay: 150ms;
 }
 
 .clinicals-stat::before {
@@ -487,6 +514,7 @@ body:has(.clinicals) {
 @media (prefers-reduced-motion: reduce) {
   .clinicals-bg,
   .clinicals-card,
+  .clinicals-stat,
   .clinicals-stat::before,
   .clinicals-node,
   .clinicals-fill {
@@ -497,5 +525,10 @@ body:has(.clinicals) {
     opacity: calc(1 - min(1, var(--card-dist)) * 0.3);
     transform: none;
     filter: blur(calc(min(1, var(--card-dist)) * 10px));
+  }
+
+  .clinicals-stat {
+    opacity: 1;
+    transform: none;
   }
 }

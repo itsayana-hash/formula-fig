@@ -27,6 +27,9 @@ let wheelAxis = null;
 let wheelLock = false;
 let wheelReset = 0;
 let wheelUnlock = 0;
+let verticalTabScroll = true;
+const visitedTabs = new Set();
+const stats = [...document.querySelectorAll(".clinicals-stat")];
 
 function cardWidth() {
   const laidOut = cards[0].offsetWidth;
@@ -101,14 +104,6 @@ function goStep(next) {
   return true;
 }
 
-function goTab(next, { resetStep = true } = {}) {
-  const clamped = clamp(next, 0, TAB_ORDER.length - 1);
-  if (clamped === tabIndex) return false;
-  applyTab(clamped);
-  if (resetStep) applyStep(0);
-  return true;
-}
-
 function isDesktop() {
   return window.matchMedia(DESKTOP_MQ).matches;
 }
@@ -158,6 +153,8 @@ function onWheel(event) {
   const axis = absY > absX * 1.25 ? "y" : absX >= absY * 1.25 ? "x" : null;
   if (!axis) return;
 
+  if (axis === "y" && !verticalTabScroll) return;
+
   event.preventDefault();
   if (wheelLock) return;
 
@@ -172,8 +169,14 @@ function onWheel(event) {
   }, 80);
 
   if (axis === "y") {
-    if (wheelAccum >= WHEEL_SNAP && goTab(tabIndex + 1)) lockWheel();
-    else if (wheelAccum <= -WHEEL_SNAP && goTab(tabIndex - 1)) lockWheel();
+    if (wheelAccum >= WHEEL_SNAP && goTab(tabIndex + 1, { fromScroll: true })) {
+      lockWheel();
+    } else if (
+      wheelAccum <= -WHEEL_SNAP &&
+      goTab(tabIndex - 1, { fromScroll: true })
+    ) {
+      lockWheel();
+    }
     return;
   }
 
@@ -193,8 +196,11 @@ function onKeydown(event) {
   }
 
   if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+    if (!verticalTabScroll) return;
     event.preventDefault();
-    goTab(event.key === "ArrowDown" ? tabIndex + 1 : tabIndex - 1);
+    goTab(event.key === "ArrowDown" ? tabIndex + 1 : tabIndex - 1, {
+      fromScroll: true,
+    });
   }
 }
 
@@ -212,16 +218,38 @@ function playCardsIn() {
   cards.forEach((card) => {
     card.style.transition = "none";
   });
+  stats.forEach((stat) => {
+    stat.style.transition = "none";
+  });
   void root.offsetWidth;
   cards.forEach((card) => {
     card.style.transition = "";
+  });
+  stats.forEach((stat) => {
+    stat.style.transition = "";
   });
   requestAnimationFrame(() => {
     root.classList.add("is-cards-ready");
   });
 }
 
-function applyTab(next) {
+function noteTabVisit(index, { fromScroll = false } = {}) {
+  visitedTabs.add(index);
+  if (fromScroll && visitedTabs.size >= TAB_ORDER.length) {
+    verticalTabScroll = false;
+  }
+}
+
+function goTab(next, { resetStep = true, fromScroll = false } = {}) {
+  const clamped = clamp(next, 0, TAB_ORDER.length - 1);
+  if (clamped === tabIndex) return false;
+  if (fromScroll && !verticalTabScroll) return false;
+  applyTab(clamped, { fromScroll });
+  if (resetStep) applyStep(0);
+  return true;
+}
+
+function applyTab(next, { fromScroll = false } = {}) {
   tabIndex = clamp(next, 0, TAB_ORDER.length - 1);
   const name = TAB_ORDER[tabIndex];
   root.dataset.tab = name;
@@ -235,6 +263,7 @@ function applyTab(next) {
   });
   prevTab?.toggleAttribute("disabled", tabIndex <= 0);
   nextTab?.toggleAttribute("disabled", tabIndex >= TAB_ORDER.length - 1);
+  noteTabVisit(tabIndex, { fromScroll });
   playCardsIn();
 }
 
@@ -302,7 +331,7 @@ function finishDrag(event) {
 
   if (session.axis === "y") {
     const clientY = Number.isFinite(event.clientY) ? event.clientY : session.lastY;
-    goTab(tabFromGesture(session, clientY));
+    goTab(tabFromGesture(session, clientY), { fromScroll: true });
     return;
   }
 
@@ -359,6 +388,7 @@ function onPointerMove(event) {
     if (Math.hypot(deltaX, deltaY) < DRAG_THRESHOLD) return;
 
     if (Math.abs(deltaY) > Math.abs(deltaX) * 1.25) {
+      if (!verticalTabScroll) return;
       drag.axis = "y";
     } else if (Math.abs(deltaX) >= Math.abs(deltaY) * 1.25) {
       drag.axis = "x";
