@@ -63,7 +63,15 @@ function setOffset(x, { animate = false } = {}) {
   row.style.transition = animate ? `transform ${durationEase()}` : "none";
   row.style.transform = `translate3d(${-offsetX}px, 0, 0)`;
   const s = stride();
-  root.style.setProperty("--clinicals-step", s ? String(offsetX / s) : String(step));
+  const progress = s ? offsetX / s : step;
+  root.style.setProperty("--clinicals-step", String(progress));
+  updateCardFocus(progress);
+}
+
+function updateCardFocus(progress) {
+  cards.forEach((card, i) => {
+    card.style.setProperty("--card-dist", String(Math.abs(i - progress)));
+  });
 }
 
 function setActiveVisual(index) {
@@ -190,6 +198,29 @@ function onKeydown(event) {
   }
 }
 
+function reduceMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function playCardsIn() {
+  if (reduceMotion()) {
+    root.classList.add("is-cards-ready");
+    return;
+  }
+
+  root.classList.remove("is-cards-ready");
+  cards.forEach((card) => {
+    card.style.transition = "none";
+  });
+  void root.offsetWidth;
+  cards.forEach((card) => {
+    card.style.transition = "";
+  });
+  requestAnimationFrame(() => {
+    root.classList.add("is-cards-ready");
+  });
+}
+
 function applyTab(next) {
   tabIndex = clamp(next, 0, TAB_ORDER.length - 1);
   const name = TAB_ORDER[tabIndex];
@@ -204,6 +235,7 @@ function applyTab(next) {
   });
   prevTab?.toggleAttribute("disabled", tabIndex <= 0);
   nextTab?.toggleAttribute("disabled", tabIndex >= TAB_ORDER.length - 1);
+  playCardsIn();
 }
 
 function releaseCapture(id) {

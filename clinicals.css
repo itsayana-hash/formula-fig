@@ -309,16 +309,23 @@ body:has(.clinicals) {
   align-items: flex-start;
   gap: 20px;
   overflow: visible;
-  opacity: 0.7;
-  filter: blur(10px);
+  --card-dist: 1;
+  opacity: 0;
+  filter: blur(calc(min(1, var(--card-dist)) * 10px));
+  transform: translate3d(0, 10px, 0);
   transition:
-    opacity var(--duration) var(--ease),
+    opacity 500ms ease,
+    transform 500ms ease,
     filter var(--duration) var(--ease);
 }
 
-.clinicals-card.is-active {
-  opacity: 1;
-  filter: blur(0);
+.clinicals.is-cards-ready .clinicals-card {
+  opacity: calc(1 - min(1, var(--card-dist)) * 0.3);
+  transform: translate3d(0, 0, 0);
+}
+
+.clinicals-stage.is-dragging .clinicals-card {
+  transition: none;
 }
 
 .clinicals-card__label {
@@ -484,5 +491,11 @@ body:has(.clinicals) {
   .clinicals-node,
   .clinicals-fill {
     transition: none;
+  }
+
+  .clinicals-card {
+    opacity: calc(1 - min(1, var(--card-dist)) * 0.3);
+    transform: none;
+    filter: blur(calc(min(1, var(--card-dist)) * 10px));
   }
 }
