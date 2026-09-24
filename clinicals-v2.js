@@ -32,8 +32,6 @@ let wheelAxis = null;
 let wheelLock = false;
 let wheelReset = 0;
 let wheelUnlock = 0;
-let verticalTabScroll = true;
-const visitedTabs = new Set();
 let introNudgePlayed = false;
 let indicatorReady = false;
 let indicatorX = 0;
@@ -174,8 +172,6 @@ function onWheel(event) {
   const axis = absY > absX * 1.25 ? "y" : absX >= absY * 1.25 ? "x" : null;
   if (!axis) return;
 
-  if (axis === "y" && !verticalTabScroll) return;
-
   event.preventDefault();
   if (wheelLock) return;
 
@@ -217,7 +213,6 @@ function onKeydown(event) {
   }
 
   if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-    if (!verticalTabScroll) return;
     event.preventDefault();
     goTab(event.key === "ArrowDown" ? tabIndex + 1 : tabIndex - 1, {
       fromScroll: true,
@@ -254,13 +249,6 @@ function playCardsIn() {
   });
 }
 
-function noteTabVisit(index, { fromScroll = false } = {}) {
-  visitedTabs.add(index);
-  if (fromScroll && visitedTabs.size >= TAB_ORDER.length) {
-    verticalTabScroll = false;
-  }
-}
-
 function syncTabIndicator({ animate = true } = {}) {
   if (!indicator || !tabsEl) return;
   const active = tabs[tabIndex];
@@ -290,7 +278,6 @@ function syncTabIndicator({ animate = true } = {}) {
 function goTab(next, { resetStep = true, fromScroll = false } = {}) {
   const clamped = clamp(next, 0, TAB_ORDER.length - 1);
   if (clamped === tabIndex) return false;
-  if (fromScroll && !verticalTabScroll) return false;
   applyTab(clamped, { fromScroll });
   if (resetStep) applyStep(0);
   return true;
@@ -310,7 +297,6 @@ function applyTab(next, { fromScroll = false } = {}) {
   });
   prevTab?.toggleAttribute("disabled", tabIndex <= 0);
   nextTab?.toggleAttribute("disabled", tabIndex >= TAB_ORDER.length - 1);
-  noteTabVisit(tabIndex, { fromScroll });
   syncTabIndicator({ animate: indicatorReady });
   indicatorReady = true;
   playCardsIn();
@@ -480,7 +466,6 @@ function onPointerMove(event) {
     if (Math.hypot(deltaX, deltaY) < DRAG_THRESHOLD) return;
 
     if (Math.abs(deltaY) > Math.abs(deltaX) * 1.25) {
-      if (!verticalTabScroll) return;
       drag.axis = "y";
     } else if (Math.abs(deltaX) >= Math.abs(deltaY) * 1.25) {
       drag.axis = "x";
