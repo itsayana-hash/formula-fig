@@ -120,14 +120,38 @@ body:has(.clinicals) {
 }
 
 .clinicals-tabs {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 2.5px;
   padding: 0;
+  overflow: visible;
+}
+
+.clinicals-tab-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  box-sizing: border-box;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: rgba(33, 33, 33, 0.6);
+  transform: translate3d(0, 0, 0);
+  transition:
+    left var(--duration) var(--ease),
+    top var(--duration) var(--ease),
+    width var(--duration) var(--ease),
+    height var(--duration) var(--ease),
+    transform 420ms ease;
 }
 
 .clinicals-tab {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -137,18 +161,13 @@ body:has(.clinicals) {
   font-size: 15px;
   line-height: 1.35;
   white-space: nowrap;
+  background: transparent;
 }
 
 .clinicals-tab img {
   width: 10px;
   height: 10px;
   pointer-events: none;
-}
-
-.clinicals-tab.is-active {
-  background: var(--clinicals-frost);
-  backdrop-filter: blur(var(--clinicals-frost-blur));
-  -webkit-backdrop-filter: blur(var(--clinicals-frost-blur));
 }
 
 .clinicals-stage {
@@ -167,6 +186,46 @@ body:has(.clinicals) {
 .clinicals-stage.is-dragging,
 .clinicals-stage.is-dragging .clinicals-slider {
   cursor: grabbing;
+}
+
+.clinicals-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 120px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  pointer-events: auto;
+}
+
+.clinicals-progress__dot {
+  box-sizing: border-box;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: background-color var(--duration) var(--ease), transform 200ms ease;
+}
+
+.clinicals-progress__dot.is-on {
+  background: #ffffff;
+}
+
+.clinicals-progress__dot:focus-visible {
+  outline: 1px solid #ffffff;
+  outline-offset: 3px;
 }
 
 .clinicals-slider {
@@ -477,6 +536,15 @@ body:has(.clinicals) {
     align-items: center;
   }
 
+  .clinicals-slider {
+    padding-left: var(--clinicals-gutter);
+    overflow: visible;
+  }
+
+  .clinicals-progress {
+    bottom: 140px;
+  }
+
   .clinicals-node {
     pointer-events: auto;
   }
@@ -485,11 +553,6 @@ body:has(.clinicals) {
     content: "";
     position: absolute;
     inset: -10px;
-  }
-
-  .clinicals-slider {
-    padding-left: var(--clinicals-gutter);
-    overflow: visible;
   }
 
   .clinicals-card__label {
@@ -517,7 +580,9 @@ body:has(.clinicals) {
   .clinicals-stat,
   .clinicals-stat::before,
   .clinicals-node,
-  .clinicals-fill {
+  .clinicals-fill,
+  .clinicals-tab-indicator,
+  .clinicals-progress__dot {
     transition: none;
   }
 

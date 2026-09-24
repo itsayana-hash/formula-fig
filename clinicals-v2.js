@@ -1,12 +1,16 @@
 const root = document.querySelector(".clinicals");
 const stage = document.querySelector(".clinicals-stage");
 const row = document.querySelector("[data-row]");
+const tabsEl = document.querySelector(".clinicals-tabs");
+const indicator = document.querySelector(".clinicals-tab-indicator");
 const cards = [...document.querySelectorAll("[data-card]")];
 const nodes = [...document.querySelectorAll("[data-node]")];
-const tabs = [...document.querySelectorAll("[data-tab]")];
+const tabs = [...document.querySelectorAll(".clinicals-tab[data-tab]")];
 const bgs = [...document.querySelectorAll("[data-bg]")];
+const progressDots = [...document.querySelectorAll("[data-progress]")];
 const prevTab = document.querySelector("[data-tab-prev]");
 const nextTab = document.querySelector("[data-tab-next]");
+const stats = [...document.querySelectorAll(".clinicals-stat")];
 
 const TAB_ORDER = ["cleanse", "balance", "treat", "protect"];
 const STEPS = cards.length;
@@ -15,6 +19,7 @@ const SNAP_PX = 32;
 const WHEEL_SNAP = 36;
 const WHEEL_LOCK_MS = 480;
 const DESKTOP_MQ = "(min-width: 860px)";
+const NUDGE_MS = 420;
 
 let tabIndex = 0;
 let step = 0;
@@ -29,7 +34,12 @@ let wheelReset = 0;
 let wheelUnlock = 0;
 let verticalTabScroll = true;
 const visitedTabs = new Set();
-const stats = [...document.querySelectorAll(".clinicals-stat")];
+let introNudgePlayed = false;
+let indicatorReady = false;
+let indicatorX = 0;
+let indicatorY = 0;
+let indicatorW = 0;
+let indicatorH = 0;
 
 function cardWidth() {
   const laidOut = cards[0].offsetWidth;
@@ -61,6 +71,10 @@ function durationEase() {
   return `${duration} ${ease}`;
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
 function setOffset(x, { animate = false } = {}) {
   offsetX = clamp(x, 0, maxOffset());
   row.style.transition = animate ? `transform ${durationEase()}` : "none";
@@ -87,6 +101,13 @@ function setActiveVisual(index) {
     node.classList.toggle("is-on", i <= index);
     if (i === index) node.setAttribute("aria-current", "step");
     else node.removeAttribute("aria-current");
+  });
+  progressDots.forEach((dot) => {
+    const i = Number(dot.dataset.progress);
+    const on = i === index;
+    dot.classList.toggle("is-on", on);
+    if (on) dot.setAttribute("aria-current", "step");
+    else dot.removeAttribute("aria-current");
   });
 }
 
@@ -240,6 +261,32 @@ function noteTabVisit(index, { fromScroll = false } = {}) {
   }
 }
 
+function syncTabIndicator({ animate = true } = {}) {
+  if (!indicator || !tabsEl) return;
+  const active = tabs[tabIndex];
+  if (!active) return;
+
+  const tabsBox = tabsEl.getBoundingClientRect();
+  const tabBox = active.getBoundingClientRect();
+  indicatorX = tabBox.left - tabsBox.left;
+  indicatorY = tabBox.top - tabsBox.top;
+  indicatorW = tabBox.width;
+  indicatorH = tabBox.height;
+
+  if (!animate || reduceMotion()) {
+    indicator.style.transition = "none";
+  }
+  indicator.style.transform = "translate3d(0, 0, 0)";
+  indicator.style.left = `${indicatorX}px`;
+  indicator.style.top = `${indicatorY}px`;
+  indicator.style.width = `${indicatorW}px`;
+  indicator.style.height = `${indicatorH}px`;
+  if (!animate || reduceMotion()) {
+    void indicator.offsetWidth;
+    indicator.style.transition = "";
+  }
+}
+
 function goTab(next, { resetStep = true, fromScroll = false } = {}) {
   const clamped = clamp(next, 0, TAB_ORDER.length - 1);
   if (clamped === tabIndex) return false;
@@ -264,7 +311,44 @@ function applyTab(next, { fromScroll = false } = {}) {
   prevTab?.toggleAttribute("disabled", tabIndex <= 0);
   nextTab?.toggleAttribute("disabled", tabIndex >= TAB_ORDER.length - 1);
   noteTabVisit(tabIndex, { fromScroll });
+  syncTabIndicator({ animate: indicatorReady });
+  indicatorReady = true;
   playCardsIn();
+}
+
+async function playIntroNudges() {
+  if (introNudgePlayed || reduceMotion()) return;
+  if (tabIndex !== 0 || root.dataset.tab !== "cleanse") return;
+  introNudgePlayed = true;
+
+  await sleep(520);
+
+  if (row) {
+    const base = -offsetX;
+    row.style.transition = `transform ${NUDGE_MS}ms ease`;
+    row.style.transform = `translate3d(${base - 20}px, 0, 0)`;
+    await sleep(NUDGE_MS);
+    row.style.transform = `translate3d(${base}px, 0, 0)`;
+    await sleep(NUDGE_MS);
+    row.style.transition = "";
+    setOffset(offsetX, { animate: false });
+  }
+
+  if (indicator && tabsEl && tabs[0] && tabs[1]) {
+    syncTabIndicator({ animate: false });
+    const tabsBox = tabsEl.getBoundingClientRect();
+    const balanceBox = tabs[1].getBoundingClientRect();
+    const targetRight = balanceBox.left - tabsBox.left + balanceBox.width * 0.5;
+    const nudgeX = targetRight - (indicatorX + indicatorW);
+
+    indicator.style.transition = `transform ${NUDGE_MS}ms ease`;
+    indicator.style.transform = `translate3d(${nudgeX}px, 0, 0)`;
+    await sleep(NUDGE_MS);
+    indicator.style.transform = "translate3d(0, 0, 0)";
+    await sleep(NUDGE_MS);
+    indicator.style.transition = "";
+    syncTabIndicator({ animate: false });
+  }
 }
 
 function releaseCapture(id) {
@@ -348,9 +432,17 @@ function onNodeClick(event) {
   applyStep(index);
 }
 
+function onProgressClick(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  const index = Number(event.currentTarget.dataset.progress);
+  if (!Number.isFinite(index)) return;
+  applyStep(index);
+}
+
 function onPointerDown(event) {
   if (!event.isPrimary || event.button !== 0) return;
-  if (event.target.closest("[data-node]")) return;
+  if (event.target.closest("[data-node], [data-progress]")) return;
   if (event.cancelable) event.preventDefault();
 
   if (raf) {
@@ -451,7 +543,7 @@ document.addEventListener(
   "click",
   (event) => {
     if (!suppressClick) return;
-    if (event.target.closest("[data-node]")) return;
+    if (event.target.closest("[data-node], [data-progress]")) return;
     event.preventDefault();
     event.stopPropagation();
   },
@@ -460,6 +552,10 @@ document.addEventListener(
 
 nodes.forEach((node) => {
   node.addEventListener("click", onNodeClick);
+});
+
+progressDots.forEach((dot) => {
+  dot.addEventListener("click", onProgressClick);
 });
 
 tabs.forEach((tab) => {
@@ -477,8 +573,14 @@ nextTab?.addEventListener("click", () => {
 window.addEventListener("resize", () => {
   if (drag) return;
   applyStep(step, { animate: false });
+  syncTabIndicator({ animate: false });
 });
 
 const startTab = TAB_ORDER.indexOf(new URLSearchParams(location.search).get("tab"));
 applyTab(startTab >= 0 ? startTab : 0);
 applyStep(0, { animate: false });
+syncTabIndicator({ animate: false });
+requestAnimationFrame(() => {
+  syncTabIndicator({ animate: false });
+  playIntroNudges();
+});
