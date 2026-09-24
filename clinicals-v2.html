@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      (function () {
+        if (location.protocol === "file:") return;
+        var path = location.pathname;
+        if (/\/clinicals-v2\/?$/.test(path)) {
+          document.write(
+            '<base href="' + path.replace(/clinicals-v2\/?$/, "") + '">'
+          );
+        }
+      })();
+    </script>
+    <title>Clinicals (V2)</title>
+    <link
+      rel="preload"
+      href="assets/fonts/FF_Sans-Regular_web.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="clinicals-v2.css?v=v2" />
+  </head>
+  <body>
+    <section class="clinicals" data-tab="cleanse" data-step="0" aria-label="Clinicals">
+      <div class="clinicals-bgs" aria-hidden="true">
+        <picture class="clinicals-bg is-on" data-bg="cleanse">
+          <source
+            media="(min-width: 860px)"
+            srcset="assets/clinicals/cleanse.jpg"
+            width="1024"
+            height="640"
+          />
+          <img
+            src="assets/clinicals/cleanse-mobile.jpg"
+            alt=""
+            width="473"
+            height="1024"
+          />
+        </picture>
+        <picture class="clinicals-bg" data-bg="balance">
+          <source
+            media="(min-width: 860px)"
+            srcset="assets/clinicals/balance.jpg"
+            width="1024"
+            height="640"
+          />
+          <img
+            src="assets/clinicals/balance-mobile.jpg"
+            alt=""
+            width="473"
+            height="1024"
+          />
+        </picture>
+        <picture class="clinicals-bg" data-bg="treat">
+          <source
+            media="(min-width: 860px)"
+            srcset="assets/clinicals/treat.jpg"
+            width="1024"
+            height="640"
+          />
+          <img
+            src="assets/clinicals/treat-mobile.jpg"
+            alt=""
+            width="473"
+            height="1024"
+          />
+        </picture>
+        <picture class="clinicals-bg" data-bg="protect">
+          <source
+            media="(min-width: 860px)"
+            srcset="assets/clinicals/protect.jpg"
+            width="1024"
+            height="640"
+          />
+          <img
+            src="assets/clinicals/protect-mobile.jpg"
+            alt=""
+            width="473"
+            height="1024"
+          />
+        </picture>
+      </div>
+
+      <header class="clinicals-header">
+        <div class="clinicals-header__lead">
+          <p class="clinicals-title">Consumer Perception Study</p>
+        </div>
+        <button class="clinicals-more" type="button">
+          View the Study<span aria-hidden="true">+</span>
+        </button>
+      </header>
+
+      <div class="clinicals-main">
+        <div class="clinicals-tabs" role="tablist" aria-label="Routine phase">
+          <button
+            class="clinicals-tab is-active"
+            type="button"
+            role="tab"
+            aria-selected="true"
+            data-tab="cleanse"
+          >
+            Cleanse
+            <img
+              src="assets/clinicals/icon-cleanse.svg"
+              alt=""
+              width="10"
+              height="10"
+            />
+          </button>
+          <button
+            class="clinicals-tab"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            data-tab="balance"
+          >
+            Balance
+            <img
+              src="assets/clinicals/icon-balance.svg"
+              alt=""
+              width="10"
+              height="10"
+            />
+          </button>
+          <button
+            class="clinicals-tab"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            data-tab="treat"
+          >
+            Treat
+            <img
+              src="assets/clinicals/icon-treat.svg"
+              alt=""
+              width="10"
+              height="10"
+            />
+          </button>
+          <button
+            class="clinicals-tab"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            data-tab="protect"
+          >
+            Protect
+            <img
+              src="assets/clinicals/icon-protect.svg"
+              alt=""
+              width="10"
+              height="10"
+            />
+          </button>
+        </div>
+
+        <div class="clinicals-stage">
+          <div class="clinicals-slider" data-slider>
+            <div class="clinicals-row" data-row>
+              <div class="clinicals-track" aria-hidden="true">
+                <span class="clinicals-rail"></span>
+                <span class="clinicals-fill"></span>
+                <button
+                  class="clinicals-node is-on"
+                  type="button"
+                  data-node="0"
+                  aria-label="After 1 Use: First thing you notice"
+                  aria-current="step"
+                ></button>
+                <button
+                  class="clinicals-node"
+                  type="button"
+                  data-node="1"
+                  aria-label="After 1 Week: Next thing you notice"
+                ></button>
+                <button
+                  class="clinicals-node"
+                  type="button"
+                  data-node="2"
+                  aria-label="After 2 Weeks: Consistent use"
+                ></button>
+              </div>
+              <div class="clinicals-cards">
+                <article class="clinicals-card is-active" data-card="0">
+                  <p class="clinicals-card__label">
+                    After 1 Use: First thing you notice
+                  </p>
+                  <div class="clinicals-stats">
+                    <div class="clinicals-stat">
+                      <p class="clinicals-stat__pct">
+                        <span>100%</span>
+                        <span class="clinicals-stat__of">of consumers</span>
+                      </p>
+                      <p class="clinicals-stat__copy">
+                        Agreed the essence provides an immediate boost of
+                        hydration.
+                      </p>
+                    </div>
+                    <div class="clinicals-stat">
+                      <p class="clinicals-stat__pct">
+                        <span>100%</span>
+                        <span class="clinicals-stat__of">of consumers</span>
+                      </p>
+                      <p class="clinicals-stat__copy">
+                        Agreed the essence provides an immediate boost of
+                        hydration.
+                      </p>
+                    </div>
+                    <div class="clinicals-stat">
+                      <p class="clinicals-stat__pct">
+                        <span>100%</span>
+                        <span class="clinicals-stat__of">of consumers</span>
+                      </p>
+                      <p class="clinicals-stat__copy">
+                        Agreed the essence provides an immediate boost of
+                        hydration.
+                      </p>
+                    </div>
+                    <div class="clinicals-stat">
+                      <p class="clinicals-stat__pct">
+                        <span>100%</span>
+                        <span class="clinicals-stat__of">of consumers</span>
+                      </p>
+                      <p class="clinicals-stat__copy">
+                        Agreed the essence provides an immediate boost of
+                        hydration.
+                      </p>
+                    </div>
+                  </div>
+                </article>
+                <article class="clinicals-card" data-card="1">
+                  <p class="clinicals-card__label">
+                    After 1 Week: Next thing you notice
+                  </p>
+                  <div class="clinicals-stats">
+                    <div class="clinicals-stat">
+                      <p class="clinicals-stat__pct">
+                        <span>100%</span>
+                        <span class="clinicals-stat__of">of consumers</span>
+                      </p>
+                      <p class="clinicals-stat__copy">
+                        Agreed the essence provides an immediate boost of
+                        hydration.
+                      </p>
+                    </div>
+                    <div class="clinicals-stat">
+                      <p class="clinicals-stat__pct">
+                        <span>100%</span>
+                        <span class="clinicals-stat__of">of consumers</span>
+                      </p>
+                      <p class="clinicals-stat__copy">
+                        Agreed the essence provides an immediate boost of
+                        hydration.
+                      </p>
+                    </div>
+                    <div class="clinicals-stat">
+                      <p class="clinicals-stat__pct">
+                        <span>100%</span>
+                        <span class="clinicals-stat__of">of consumers</span>
+                      </p>
+                      <p class="clinicals-stat__copy">
+                        Agreed the essence provides an immediate boost of
+                        hydration.
+                      </p>
+                    </div>
+                    <div class="clinicals-stat">
+                      <p class="clinicals-stat__pct">
+                        <span>100%</span>
+                        <span class="clinicals-stat__of">of consumers</span>
+                      </p>
+                      <p class="clinicals-stat__copy">
+                        Agreed the essence provides an immediate boost of
+                        hydration.
+                      </p>
+                    </div>
+                  </div>
+                </article>
+                <article class="clinicals-card" data-card="2">
+                  <p class="clinicals-card__label">After 2 Weeks: Consistent use</p>
+                  <div class="clinicals-stats">
+                    <div class="clinicals-stat">
+                      <p class="clinicals-stat__pct">
+                        <span>100%</span>
+                        <span class="clinicals-stat__of">of consumers</span>
+                      </p>
+                      <p class="clinicals-stat__copy">
+                        Agreed the essence provides an immediate boost of
+                        hydration.
+                      </p>
+                    </div>
+                    <div class="clinicals-stat">
+                      <p class="clinicals-stat__pct">
+                        <span>100%</span>
+                        <span class="clinicals-stat__of">of consumers</span>
+                      </p>
+                      <p class="clinicals-stat__copy">
+                        Agreed the essence provides an immediate boost of
+                        hydration.
+                      </p>
+                    </div>
+                    <div class="clinicals-stat">
+                      <p class="clinicals-stat__pct">
+                        <span>100%</span>
+                        <span class="clinicals-stat__of">of consumers</span>
+                      </p>
+                      <p class="clinicals-stat__copy">
+                        Agreed the essence provides an immediate boost of
+                        hydration.
+                      </p>
+                    </div>
+                    <div class="clinicals-stat">
+                      <p class="clinicals-stat__pct">
+                        <span>100%</span>
+                        <span class="clinicals-stat__of">of consumers</span>
+                      </p>
+                      <p class="clinicals-stat__copy">
+                        Agreed the essence provides an immediate boost of
+                        hydration.
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script src="clinicals-v2.js?v=v2"></script>
+  </body>
+</html>
